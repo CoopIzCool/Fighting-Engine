@@ -216,7 +216,7 @@ void Game::CreateBasicGeometry()
 	{
 		{ XMFLOAT3(-0.3f, -0.7f, +0.0f), red },
 		{ XMFLOAT3(+0.4f, -0.6f, +0.0f), purple },
-		{ XMFLOAT3(+0.8f, -0.7f, +0.0f), blue },
+		{ XMFLOAT3(+0.8f, -0.7f, +0.0f),  blue },
 		{ XMFLOAT3(+0.4f, -0.8f, +0.0f), purple  },
 
 	};
@@ -266,14 +266,14 @@ void Game::Update(float deltaTime, float totalTime)
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
-	entity1->GetTransform()->MoveAbsolute(deltaTime * 0.1, 0, 0);
+	/*entity1->GetTransform()->MoveAbsolute(deltaTime * 0.1, 0, 0);
 	entity2->GetTransform()->MoveAbsolute(deltaTime * -0.1, deltaTime * -0.1, 0);
 	entity2->GetTransform()->Rotate(0, 0, deltaTime * 0.1);
 	entity3->GetTransform()->Rotate(0, 0, deltaTime * -0.1);
 	entity3->GetTransform()->Scale(XMScalarSin(deltaTime), XMScalarSin(deltaTime ), XMScalarSin(deltaTime ));
 	entity4->GetTransform()->MoveAbsolute(deltaTime * 0.1, 0, 0);
 	entity5->GetTransform()->MoveAbsolute(deltaTime * -0.1, deltaTime * -0.1, 0);
-	entity5->GetTransform()->Rotate(0, 0, deltaTime * 0.1);
+	entity5->GetTransform()->Rotate(0, 0, deltaTime * 0.1);*/
 
 	//update camera
 	camera->Update(deltaTime, this->hWnd);
