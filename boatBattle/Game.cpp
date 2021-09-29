@@ -1,8 +1,8 @@
 #include "Game.h"
 #include "Vertex.h"
 #include "BufferStruct.h"
-#include "DDSTextureLoader.h"
-#include "WICTextureLoader.h"
+//#include "DDSTextureLoader.h"
+//#include "WICTextureLoader.h"
 
 // Needed for a helper function to read compiled shader files from the hard drive
 #pragma comment(lib, "d3dcompiler.lib")
@@ -51,9 +51,9 @@ Game::~Game()
 	// we don't need to explicitly clean up those DirectX objects
 	// - If we weren't using smart pointers, we'd need
 	//   to call Release() on each DirectX object created in Game
-
+	
 	delete(camera);
-
+	/*
 	delete(pixelShader);
 	delete(vertexShader);
 	delete(pixelNormalShader);
@@ -81,7 +81,7 @@ Game::~Game()
 	{
 		delete(boats[i]);
 	}
-	
+	*/
 }
 
 // --------------------------------------------------------
@@ -97,6 +97,7 @@ void Game::Init()
 
 	unsigned int size = sizeof(VertexShaderExternalData);
 	size = (size + 15) / 16 * 16;
+	/*
 	light = { XMFLOAT3(0.4f, 0.2f, 0.33f), 1.0f, XMFLOAT3(1.0f, -1.0f, 0.0f) };
 	ambient = XMFLOAT3(0.1f, 0.07f, 0.04f);
 	light2 = { XMFLOAT3(0.41f, 0.05f, 0.68f), 1.0f, XMFLOAT3(1.0f, 10.0f, 1.0f) };
@@ -105,66 +106,12 @@ void Game::Init()
 	ambient3 = XMFLOAT3(0.1f, 0.07f, 0.04f);
 	pointLight = { XMFLOAT3(0.5f, 0.2f, 0.83f),1.0f, XMFLOAT3(0.0f, 2.0f, 0.0f) };
 	pointAmbient = XMFLOAT3(0.1f, 0.07f, 0.04f);
-
+	*/
 	//initialize textures
 
 	//texture1
-	CreateWICTextureFromFile(device.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/wave.png").c_str(),
-		0,
-		textureSRVWater.GetAddressOf());
-
-	//cannonballTextures
-
-	CreateWICTextureFromFile(device.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/bronze_albedo.png").c_str(),
-		0,
-		textureCannon.GetAddressOf());
-
-	CreateWICTextureFromFile(device.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/bronze_normals.png").c_str(),
-		0,
-		textureCannonNorm.GetAddressOf());
-
-	CreateWICTextureFromFile(device.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/bronze_roughness.png").c_str(),
-		0,
-		textureCannonRough.GetAddressOf());
-
-	CreateWICTextureFromFile(device.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/bronze_metal.png").c_str(),
-		0,
-		textureCannonMetal.GetAddressOf());
-
-	//boat Textures
-
-	CreateWICTextureFromFile(device.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/wood_albedo.png").c_str(),
-		0,
-		textureBoat.GetAddressOf());
-
-	CreateWICTextureFromFile(device.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/wood_normals.png").c_str(),
-		0,
-		textureBoatNorm.GetAddressOf());
-
-	CreateWICTextureFromFile(device.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/wood_roughness.png").c_str(),
-		0,
-		textureBoatRough.GetAddressOf());
-
-	CreateWICTextureFromFile(device.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/wood_metal.png").c_str(),
-		0,
-		textureBoatMetal.GetAddressOf());
-
-	//sky
-	CreateDDSTextureFromFile(device.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/SunnyCubeMap.dds").c_str(),
-		0,
-		textureSky.GetAddressOf());
-
-
+	
+	/*
 	D3D11_SAMPLER_DESC sampDesc = {};
 	
 	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
@@ -177,10 +124,11 @@ void Game::Init()
 	// Helper methods for loading shaders, creating some basic
 	// geometry to draw and some simple camera matrices.
 	//  - You'll be expanding and/or replacing these later
-	LoadShaders();
+	//LoadShaders();
+	*/
 	CreateBasicGeometry();
 
-	std::cout << "Boat Simulator: Press 'A' and 'D' to rotate and click to shoot";
+	//std::cout << "Boat Simulator: Press 'A' and 'D' to rotate and click to shoot";
 	
 }
 
@@ -194,12 +142,14 @@ void Game::Init()
 // --------------------------------------------------------
 void Game::LoadShaders()
 {
+	/*
 	vertexShader = new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"VertexShader.cso").c_str());
 	pixelShader = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShader.cso").c_str());
 	vertexNormalShader = new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"NormalMapsVS.cso").c_str());
 	pixelNormalShader = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"NormalMapsPS.cso").c_str());
 	vertexSkyShader = new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"SkyBoxVS.cso").c_str());
 	pixelSkyShader = new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"SkyBoxPS.cso").c_str());
+	*/
 }
 
 
@@ -209,6 +159,7 @@ void Game::LoadShaders()
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
+	/*
 	//load meshes
 	meshWater = new Mesh(GetFullPathTo("../../Assets/Models/cube.obj").c_str(), device);
 	meshSky = new Mesh(GetFullPathTo("../../Assets/Models/cube.obj").c_str(), device);
@@ -236,9 +187,9 @@ void Game::CreateBasicGeometry()
 	
 	water->GetTransform()->setScale(150.0f, 1.0f , 150.0f);
 	playerBoat->GetTransform()->setScale(0.003f, 0.003f, 0.003f);
+	*/
 
-
-	sky = new Sky(meshSky, sampler, textureSky, pixelSkyShader, vertexSkyShader, device);
+	//sky = new Sky(meshSky, sampler, textureSky, pixelSkyShader, vertexSkyShader, device);
 }
 
 
@@ -261,7 +212,7 @@ void Game::Update(float deltaTime, float totalTime)
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
-	
+	/*
 	//fire a cannonball when clicked
 	if (GetAsyncKeyState(VK_LBUTTON) & 0x8000 && camera->isFree() == false && !prevMouseClicked && !gameOver)
 	{
@@ -298,7 +249,7 @@ void Game::Update(float deltaTime, float totalTime)
 				{
 					/*
 					//nullptr CRASH = new *nullptr;
-					*/
+					
 					//game over state, remove boats and lock cannon firing
 					for (int i = 0; i < boats.size(); i++)
 					{
@@ -312,6 +263,7 @@ void Game::Update(float deltaTime, float totalTime)
 				}
 			}
 		}
+		
 	}
 
 	//code to spawn in boats
@@ -335,7 +287,7 @@ void Game::Update(float deltaTime, float totalTime)
 	
 
 
-	
+	*/
 	//update camera
 	camera->Update(deltaTime, this->hWnd);
 
@@ -361,7 +313,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		1.0f,
 		0);
 	
-
+	/*
 	for(int i = 0; i < 2; i++)
 	{
 
@@ -538,7 +490,8 @@ void Game::Draw(float deltaTime, float totalTime)
 			context->DrawIndexed(boats[i]->GetMesh()->getIndecesies(), 0, 0);
 		}
 	}
-	sky->Draw(context, camera);
+	*/
+	//sky->Draw(context, camera);
 	// Present the back buffer to the user
 //  - Puts the final frame we're drawing into the window so the user can see it
 //  - Do this exactly ONCE PER FRAME (always at the very end of the frame)

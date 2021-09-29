@@ -55,6 +55,7 @@ private:
 	SimpleVertexShader* vertexSkyShader;
 
 	//meshes
+	/*
 	Mesh* meshWater;
 	Mesh* meshCannon;
 	Mesh* meshBoat;
@@ -68,15 +69,15 @@ private:
 	std::vector<Enemy*> boats;
 	//std::vector<Cannonball*> balls;
 	//std::vector<Enemy*> boats;
-
+	*/
 	Camera* camera;
-
+	/*
 	Material* mWater;
 	Material* mCannon;
 	Material* mBoat;
+	*/
 
-
-
+	/*
 	DirectionalLight light;
 	DirectionalLight light2;
 	DirectionalLight light3;
@@ -92,7 +93,7 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> textureSRVWater; //one per texture;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> textureSky;
-
+	
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> textureCannon; //one per texture;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> textureCannonNorm;
@@ -105,12 +106,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> textureBoatMetal;
 	Sky* sky;
 	Mesh* meshSky;
-
+	*/
 	bool prevMouseClicked = false;
 	int counter = 100;
 
 
-	bool gameOver = false;
-	int boatsShot = 0;
+	//bool gameOver = false;
+	//int boatsShot = 0;
 };
 

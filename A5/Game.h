@@ -7,6 +7,7 @@
 #include "Entity.h"
 #include "Camera.h"
 #include "Material.h"
+#include "Player.h"
 
 
 class Game 
@@ -54,11 +55,10 @@ private:
 	//entities
 	Entity* entity1;
 	Entity* entity2;
-	Entity* entity3;
-	Entity* entity4;
-	Entity* entity5;
-	Entity* entities[5];
 
+
+	Player* p1;
+	//Player* players[2];
 	Camera* camera;
 
 	Material* m1;

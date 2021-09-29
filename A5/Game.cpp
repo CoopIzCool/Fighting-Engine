@@ -56,9 +56,9 @@ Game::~Game()
 
 	delete(entity1);
 	delete(entity2);
-	delete(entity3);
-	delete(entity4);
-	delete(entity5);
+	//delete(entity3);
+	//delete(entity4);
+	//delete(entity5);
 
 	delete(camera);
 
@@ -234,15 +234,17 @@ void Game::CreateBasicGeometry()
 
 	entity1 = new Entity(mesh1,m1);
 	entity2 = new Entity(mesh2,m2);
-	entity3 = new Entity(mesh3,m1);
-	entity4 = new Entity(mesh1,m2);
-	entity5 = new Entity(mesh3,m1);
+	//entity3 = new Entity(mesh3,m1);
+	//entity4 = new Entity(mesh1,m2);
+	//entity5 = new Entity(mesh3,m1);
 
+	/*
 	entities[0] = entity1;
 	entities[1] = entity2;
 	entities[2] = entity3;
 	entities[3] = entity4;
 	entities[4] = entity5;
+	*/
 }
 
 
@@ -265,7 +267,7 @@ void Game::Update(float deltaTime, float totalTime)
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
-
+	/*
 	entity1->GetTransform()->MoveAbsolute(deltaTime * 0.1, 0, 0);
 	entity2->GetTransform()->MoveAbsolute(deltaTime * -0.1, deltaTime * -0.1, 0);
 	entity2->GetTransform()->Rotate(0, 0, deltaTime * 0.1);
@@ -274,7 +276,8 @@ void Game::Update(float deltaTime, float totalTime)
 	entity4->GetTransform()->MoveAbsolute(deltaTime * 0.1, 0, 0);
 	entity5->GetTransform()->MoveAbsolute(deltaTime * -0.1, deltaTime * -0.1, 0);
 	entity5->GetTransform()->Rotate(0, 0, deltaTime * 0.1);
-
+	*/
+	p1->Update(deltaTime);
 	//update camera
 	camera->Update(deltaTime, this->hWnd);
 }
@@ -303,53 +306,51 @@ void Game::Draw(float deltaTime, float totalTime)
 	vsData.view = camera->GetViewMatrix();
 	vsData.projection = camera->GetProjectionMatrix();
 
-	for (int i = 0; i < 5; i++)
-	{
-		//shader decleration
-		vsData.colorTint = entities[i]->GetMaterial()->GetColorTint();
-		vsData.world = entities[i]->GetTransform()->GetWorldMatrix();
-		
-		D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
-		context->Map(constBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+	//shader decleration
+	vsData.colorTint = p1->GetMaterial()->GetColorTint();
+	vsData.world = entities[i]->GetTransform()->GetWorldMatrix();
+	
+	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
+	context->Map(constBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
 
-		memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
+	memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
 
-		context->Unmap(constBufferVS.Get(), 0);
+	context->Unmap(constBufferVS.Get(), 0);
 
-		context->VSSetConstantBuffers(0, 1, constBufferVS.GetAddressOf());
+	context->VSSetConstantBuffers(0, 1, constBufferVS.GetAddressOf());
 
 
 
-		// Set the vertex and pixel shaders to use for the next Draw() command
-		//  - These don't technically need to be set every frame
-		//  - Once you start applying different shaders to different objects,
-		//    you'll need to swap the current shaders before each draw
-		context->VSSetShader(entities[i]->GetMaterial()->GetVertexShader().Get(),0,0);
-		context->PSSetShader(entities[i]->GetMaterial()->GetPixelShader().Get(),0,0);
+	// Set the vertex and pixel shaders to use for the next Draw() command
+	//  - These don't technically need to be set every frame
+	//  - Once you start applying different shaders to different objects,
+	//    you'll need to swap the current shaders before each draw
+	context->VSSetShader(entities[i]->GetMaterial()->GetVertexShader().Get(),0,0);
+	context->PSSetShader(entities[i]->GetMaterial()->GetPixelShader().Get(),0,0);
 
 
-		// Ensure the pipeline knows how to interpret the data (numbers)
-		// from the vertex buffer.  
-		// - If all of your 3D models use the exact same vertex layout,
-		//    this could simply be done once in Init()
-		// - However, this isn't always the case (but might be for this course)
-		context->IASetInputLayout(inputLayout.Get());
+	// Ensure the pipeline knows how to interpret the data (numbers)
+	// from the vertex buffer.  
+	// - If all of your 3D models use the exact same vertex layout,
+	//    this could simply be done once in Init()
+	// - However, this isn't always the case (but might be for this course)
+	context->IASetInputLayout(inputLayout.Get());
 
 
-		// Set buffers in the input assembler
-		//  - Do this ONCE PER OBJECT you're drawing, since each object might
-		//    have different geometry.
-		//  - for this demo, this step *could* simply be done once during Init(),
-		//    but I'm doing it here because it's often done multiple times per frame
-		//    in a larger application/game
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
+	// Set buffers in the input assembler
+	//  - Do this ONCE PER OBJECT you're drawing, since each object might
+	//    have different geometry.
+	//  - for this demo, this step *could* simply be done once during Init(),
+	//    but I'm doing it here because it's often done multiple times per frame
+	//    in a larger application/game
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
 
 
-		context->IASetVertexBuffers(0, 1,entities[i]->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-		context->IASetIndexBuffer(entities[i]->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-		context->DrawIndexed(entities[i]->GetMesh()->getIndecesies(), 0, 0);
-	}
+	context->IASetVertexBuffers(0, 1,entities[i]->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+	context->IASetIndexBuffer(entities[i]->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+	context->DrawIndexed(entities[i]->GetMesh()->getIndecesies(), 0, 0);
+	
 
 	// Present the back buffer to the user
 //  - Puts the final frame we're drawing into the window so the user can see it

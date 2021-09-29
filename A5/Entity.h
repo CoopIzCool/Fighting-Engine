@@ -16,7 +16,7 @@ public:
 	Material* GetMaterial();
 
 
-private:
+protected:
 	Transform transform;
 	Mesh* mesh;
 	Material* material;
