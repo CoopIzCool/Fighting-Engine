@@ -307,8 +307,8 @@ void Game::Draw(float deltaTime, float totalTime)
 	vsData.projection = camera->GetProjectionMatrix();
 
 	//shader decleration
-	vsData.colorTint = p1->GetMaterial()->GetColorTint();
-	vsData.world = entities[i]->GetTransform()->GetWorldMatrix();
+	vsData.colorTint = p1->GetEntity->GetMaterial()->GetColorTint();
+	vsData.world = p1->GetEntity->GetTransform()->GetWorldMatrix();
 	
 	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
 	context->Map(constBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
@@ -325,8 +325,8 @@ void Game::Draw(float deltaTime, float totalTime)
 	//  - These don't technically need to be set every frame
 	//  - Once you start applying different shaders to different objects,
 	//    you'll need to swap the current shaders before each draw
-	context->VSSetShader(entities[i]->GetMaterial()->GetVertexShader().Get(),0,0);
-	context->PSSetShader(entities[i]->GetMaterial()->GetPixelShader().Get(),0,0);
+	context->VSSetShader(p1->GetEntity->GetMaterial()->GetVertexShader().Get(),0,0);
+	context->PSSetShader(p1->GetEntity->GetMaterial()->GetPixelShader().Get(),0,0);
 
 
 	// Ensure the pipeline knows how to interpret the data (numbers)
@@ -347,9 +347,9 @@ void Game::Draw(float deltaTime, float totalTime)
 	UINT offset = 0;
 
 
-	context->IASetVertexBuffers(0, 1,entities[i]->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-	context->IASetIndexBuffer(entities[i]->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-	context->DrawIndexed(entities[i]->GetMesh()->getIndecesies(), 0, 0);
+	context->IASetVertexBuffers(0, 1, p1->GetEntity->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+	context->IASetIndexBuffer(p1->GetEntity->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+	context->DrawIndexed(p1->GetEntity->GetMesh()->getIndecesies(), 0, 0);
 	
 
 	// Present the back buffer to the user

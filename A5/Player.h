@@ -3,13 +3,16 @@
 #include "Mesh.h"
 #include "Material.h"
 
-class Player: Entity
+class Player
 {
 public:
-	Player() :Entity(Mesh* me, Material* ma);
+	Player(Entity* et, int hitP);
+	~Player();
 	void Update(float dt);
 	void Damage(int dmg);
+	Entity* GetEntity();
 private:
+	Entity* entity;
 	int hitpoints = 100;
 };
 

@@ -16,6 +16,7 @@
 #include <vector>
 #include <iostream>
 #include <math.h>
+#include "Surface.h"
 
 class Game 
 	: public DXCore
@@ -54,22 +55,7 @@ private:
 	SimplePixelShader* pixelSkyShader;
 	SimpleVertexShader* vertexSkyShader;
 
-	//meshes
-	/*
-	Mesh* meshWater;
-	Mesh* meshCannon;
-	Mesh* meshBoat;
 
-	//entities
-	Entity* water;
-	Entity* playerBoat;
-	Entity* entities[5];
-	
-	std::vector<Cannonball*> balls;
-	std::vector<Enemy*> boats;
-	//std::vector<Cannonball*> balls;
-	//std::vector<Enemy*> boats;
-	*/
 	Camera* camera;
 	/*
 	Material* mWater;
