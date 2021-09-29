@@ -45,16 +45,16 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 
 	//meshes
-	Mesh* mesh1;
+	//Mesh* mesh1;
 	Mesh* mesh2;
-	Mesh* mesh3;
+	//Mesh* mesh3;
 	
 	//shaders
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constBufferVS;
 
 	//entities
 	Entity* entity1;
-	Entity* entity2;
+	//Entity* entity2;
 
 
 	Player* p1;
@@ -62,6 +62,6 @@ private:
 	Camera* camera;
 
 	Material* m1;
-	Material* m2;
+	//Material* m2;
 };
 

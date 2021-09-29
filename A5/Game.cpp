@@ -49,13 +49,13 @@ Game::~Game()
 	// we don't need to explicitly clean up those DirectX objects
 	// - If we weren't using smart pointers, we'd need
 	//   to call Release() on each DirectX object created in Game
-	delete(mesh1);
+	//delete(mesh1);
 	delete(mesh2);
-	delete(mesh3);
+	//delete(mesh3);
 
-
+	delete(p1);
 	delete(entity1);
-	delete(entity2);
+	//delete(entity2);
 	//delete(entity3);
 	//delete(entity4);
 	//delete(entity5);
@@ -63,7 +63,7 @@ Game::~Game()
 	delete(camera);
 
 	delete(m1);
-	delete(m2);
+	//delete(m2);
 }
 
 // --------------------------------------------------------
@@ -196,6 +196,7 @@ void Game::CreateBasicGeometry()
 	//    knowing the exact size (in pixels) of the image/window/etc.  
 	// - Long story short: Resizing the window also resizes the triangle,
 	//    since we're describing the triangle in terms of the window itself
+	/*
 	Vertex vertices1[] =
 	{
 		{ XMFLOAT3(+0.5f, +0.2f, +0.0f), red },
@@ -211,7 +212,7 @@ void Game::CreateBasicGeometry()
 		{ XMFLOAT3(-0.5f, -0.3f, +0.0f), green },
 
 	};
-
+	*/
 	Vertex vertices3[] =
 	{
 		{ XMFLOAT3(-0.3f, -0.7f, +0.0f), red },
@@ -221,22 +222,24 @@ void Game::CreateBasicGeometry()
 
 	};
 
-	unsigned int indices1[] = { 0, 1, 2 };
-	unsigned int indices2[] = { 0,1,2,0,2,3 };
+	//unsigned int indices1[] = { 0, 1, 2 };
+	//unsigned int indices2[] = { 0,1,2,0,2,3 };
 	unsigned int indices3[] = { 0,1,2,0,2,3 };
 
-	mesh1 = new Mesh(vertices1, 3, indices1, 3, device);
-	mesh2 = new Mesh(vertices2, 4, indices2, 6, device);
-	mesh3 = new Mesh(vertices3, 4, indices2, 6, device);
+	//mesh1 = new Mesh(vertices1, 3, indices1, 3, device);
+	mesh2 = new Mesh(vertices3, 4, indices3, 6, device);
+	//mesh3 = new Mesh(vertices3, 4, indices2, 6, device);
 
 	m1 = new Material({ 0.3f,0.8f,0.6f,1.0f }, pixelShader, vertexShader);
-	m2 = new Material({ 0.9f,0.2f,0.3f,1.0f }, pixelShader, vertexShader);
+	//2 = new Material({ 0.9f,0.2f,0.3f,1.0f }, pixelShader, vertexShader);
 
-	entity1 = new Entity(mesh1,m1);
-	entity2 = new Entity(mesh2,m2);
+	entity1 = new Entity(mesh2,m1);
+	//entity2 = new Entity(mesh2,m2);
+
 	//entity3 = new Entity(mesh3,m1);
 	//entity4 = new Entity(mesh1,m2);
 	//entity5 = new Entity(mesh3,m1);
+	p1 = new Player(entity1, 100);
 
 	/*
 	entities[0] = entity1;
@@ -307,8 +310,8 @@ void Game::Draw(float deltaTime, float totalTime)
 	vsData.projection = camera->GetProjectionMatrix();
 
 	//shader decleration
-	vsData.colorTint = p1->GetEntity->GetMaterial()->GetColorTint();
-	vsData.world = p1->GetEntity->GetTransform()->GetWorldMatrix();
+	vsData.colorTint = p1->GetEntity()->GetMaterial()->GetColorTint();
+	vsData.world = p1->GetEntity()->GetTransform()->GetWorldMatrix();
 	
 	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
 	context->Map(constBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
@@ -325,8 +328,8 @@ void Game::Draw(float deltaTime, float totalTime)
 	//  - These don't technically need to be set every frame
 	//  - Once you start applying different shaders to different objects,
 	//    you'll need to swap the current shaders before each draw
-	context->VSSetShader(p1->GetEntity->GetMaterial()->GetVertexShader().Get(),0,0);
-	context->PSSetShader(p1->GetEntity->GetMaterial()->GetPixelShader().Get(),0,0);
+	context->VSSetShader(p1->GetEntity()->GetMaterial()->GetVertexShader().Get(),0,0);
+	context->PSSetShader(p1->GetEntity()->GetMaterial()->GetPixelShader().Get(),0,0);
 
 
 	// Ensure the pipeline knows how to interpret the data (numbers)
@@ -347,9 +350,9 @@ void Game::Draw(float deltaTime, float totalTime)
 	UINT offset = 0;
 
 
-	context->IASetVertexBuffers(0, 1, p1->GetEntity->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-	context->IASetIndexBuffer(p1->GetEntity->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-	context->DrawIndexed(p1->GetEntity->GetMesh()->getIndecesies(), 0, 0);
+	context->IASetVertexBuffers(0, 1, p1->GetEntity()->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+	context->IASetIndexBuffer(p1->GetEntity()->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+	context->DrawIndexed(p1->GetEntity()->GetMesh()->getIndecesies(), 0, 0);
 	
 
 	// Present the back buffer to the user
