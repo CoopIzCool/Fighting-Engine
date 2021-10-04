@@ -1,8 +1,14 @@
 #include "Player.h"
 
 
+Player::Player(Entity* et)
+{
+}
+
 Player::Player(Entity* et, int hitP)
 {
+	entity = et;
+	hitpoints = hitP;
 }
 
 Player::~Player()

@@ -6,6 +6,7 @@
 class Player
 {
 public:
+	Player(Entity* et);
 	Player(Entity* et, int hitP);
 	~Player();
 	void Update(float dt);

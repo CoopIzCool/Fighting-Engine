@@ -33,7 +33,7 @@ Game::Game(HINSTANCE hInstance)
 #endif
 
 	//new camera
-	camera = new Camera(0, 0, -2, (float)width / height);
+	camera = new Camera(0, 0.5, -2, (float)width / height);
 
 
 }
@@ -203,16 +203,16 @@ void Game::CreateBasicGeometry()
 		{ XMFLOAT3(+0.8f, -0.1f, +0.0f), blue },
 		{ XMFLOAT3(+0.2f, -0.2f, +0.0f), green },
 	};
-
+	*/
 	Vertex vertices2[] =
 	{
-		{ XMFLOAT3(-0.5f, +0.6f, +0.0f), red },
-		{ XMFLOAT3(+0.1f, +0.6f, +0.0f), green },
-		{ XMFLOAT3(+0.1f, -0.3f, +0.0f), blue },
-		{ XMFLOAT3(-0.5f, -0.3f, +0.0f), green },
+		{ XMFLOAT3(-0.25f, +0.3f, +0.0f), red },
+		{ XMFLOAT3(+0.05f, +0.3f, +0.0f), green },
+		{ XMFLOAT3(+0.05f, -0.15f, +0.0f), blue },
+		{ XMFLOAT3(-0.25f, -0.15f, +0.0f), green },
 
 	};
-	*/
+	
 	Vertex vertices3[] =
 	{
 		{ XMFLOAT3(-0.3f, -0.7f, +0.0f), red },
@@ -222,12 +222,11 @@ void Game::CreateBasicGeometry()
 
 	};
 
-	//unsigned int indices1[] = { 0, 1, 2 };
-	//unsigned int indices2[] = { 0,1,2,0,2,3 };
+
 	unsigned int indices3[] = { 0,1,2,0,2,3 };
 
 	//mesh1 = new Mesh(vertices1, 3, indices1, 3, device);
-	mesh2 = new Mesh(vertices3, 4, indices3, 6, device);
+	mesh2 = new Mesh(vertices2, 4, indices3, 6, device);
 	//mesh3 = new Mesh(vertices3, 4, indices2, 6, device);
 
 	m1 = new Material({ 0.3f,0.8f,0.6f,1.0f }, pixelShader, vertexShader);
@@ -270,19 +269,10 @@ void Game::Update(float deltaTime, float totalTime)
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
-	/*
-	entity1->GetTransform()->MoveAbsolute(deltaTime * 0.1, 0, 0);
-	entity2->GetTransform()->MoveAbsolute(deltaTime * -0.1, deltaTime * -0.1, 0);
-	entity2->GetTransform()->Rotate(0, 0, deltaTime * 0.1);
-	entity3->GetTransform()->Rotate(0, 0, deltaTime * -0.1);
-	entity3->GetTransform()->Scale(XMScalarSin(deltaTime), XMScalarSin(deltaTime ), XMScalarSin(deltaTime ));
-	entity4->GetTransform()->MoveAbsolute(deltaTime * 0.1, 0, 0);
-	entity5->GetTransform()->MoveAbsolute(deltaTime * -0.1, deltaTime * -0.1, 0);
-	entity5->GetTransform()->Rotate(0, 0, deltaTime * 0.1);
-	*/
+
 	p1->Update(deltaTime);
 	//update camera
-	camera->Update(deltaTime, this->hWnd);
+	//camera->Update(deltaTime, this->hWnd);
 }
 
 // --------------------------------------------------------
