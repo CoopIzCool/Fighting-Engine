@@ -6,8 +6,8 @@
 class Player
 {
 public:
-	Player(Entity* et);
-	Player(Entity* et, int hitP);
+	Player(Entity* et, bool p2);
+	Player(Entity* et, int hitP, bool p2);
 	~Player();
 	void Update(float dt);
 	void Damage(int dmg);
@@ -15,5 +15,6 @@ public:
 private:
 	Entity* entity;
 	int hitpoints = 100;
+	bool isP2;
 };
 
