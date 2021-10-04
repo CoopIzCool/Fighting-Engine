@@ -248,8 +248,8 @@ void Game::CreateBasicGeometry()
 	entity2 = new Entity(mesh2,m2);
 
 
-	p1 = new Player(entity1, 100, false);
-	p2 = new Player(entity2, 100, true);
+	p1 = new Player(entity1, 100, false, vertices1);
+	p2 = new Player(entity2, 100, true, vertices2);
 	players[0] = p1;
 	players[1] = p2;
 	/*

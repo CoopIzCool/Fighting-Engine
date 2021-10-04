@@ -16,6 +16,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> GetIndexBuffer();
 
 	int getIndecesies();
+	
 
 private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
