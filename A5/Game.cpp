@@ -51,21 +51,23 @@ Game::~Game()
 	//   to call Release() on each DirectX object created in Game
 	delete(mesh1);
 	delete(mesh2);
-	//delete(mesh3);
+	delete(groundMesh);
 
 	delete(p1);
 	delete(entity1);
 	delete(p2);
 	delete(entity2);
-	//delete(entity2);
-	//delete(entity3);
-	//delete(entity4);
-	//delete(entity5);
+	delete(groundEntity);
 
 	delete(camera);
 
 	delete(m1);
 	delete(m2);
+	delete(groundMat);
+	for(int i = projectiles.size() - 1; i < 0; i--)
+	{
+		delete(projectiles[i]);
+	}
 }
 
 // --------------------------------------------------------
@@ -223,42 +225,36 @@ void Game::CreateBasicGeometry()
 
 	};
 	
-	/*
-	Vertex vertices3[] =
+	Vertex groundVerts[] =
 	{
-		{ XMFLOAT3(-0.3f, -0.7f, +0.0f), red },
-		{ XMFLOAT3(+0.4f, -0.6f, +0.0f), purple },
-		{ XMFLOAT3(+0.8f, -0.7f, +0.0f), blue },
-		{ XMFLOAT3(+0.4f, -0.8f, +0.0f), purple  },
+		{ XMFLOAT3(-10.0f, -0.15f, +0.0f), green },
+		{ XMFLOAT3(+10.0f, -0.15f, +0.0f), green },
+		{ XMFLOAT3(-10.0f, -4.35f, +0.0f), green },
+		{ XMFLOAT3(+10.0f, -4.35f, +0.0f), green },
 
 	};
-	*/
+
 
 	unsigned int indices[] = { 0,1,2,0,2,3 };
 
 	mesh1 = new Mesh(vertices1, 4, indices, 6, device);
 	mesh2 = new Mesh(vertices2, 4, indices, 6, device);
-	//mesh3 = new Mesh(vertices3, 4, indices2, 6, device);
+	groundMesh = new Mesh(groundVerts, 4, indices, 6, device);
 
 	m1 = new Material({ 0.3f,0.8f,0.6f,1.0f }, pixelShader, vertexShader);
 	m2 = new Material({ 0.9f,0.2f,0.2f,1.0f }, pixelShader, vertexShader);
-	//2 = new Material({ 0.9f,0.2f,0.3f,1.0f }, pixelShader, vertexShader);
+	groundMat = new Material({ 1.0f,1.0f,1.0f,1.0f }, pixelShader, vertexShader);
 
 	entity1 = new Entity(mesh1,m1);
 	entity2 = new Entity(mesh2,m2);
+	groundEntity = new Entity(groundMesh, groundMat);
 
 
 	p1 = new Player(entity1, 100, false, vertices1);
 	p2 = new Player(entity2, 100, true, vertices2);
 	players[0] = p1;
 	players[1] = p2;
-	/*
-	entities[0] = entity1;
-	entities[1] = entity2;
-	entities[2] = entity3;
-	entities[3] = entity4;
-	entities[4] = entity5;
-	*/
+
 }
 
 
@@ -284,8 +280,15 @@ void Game::Update(float deltaTime, float totalTime)
 
 	p1->Update(deltaTime);
 	p2->Update(deltaTime);
-	//update camera
-	//camera->Update(deltaTime, this->hWnd);
+	
+	for (int i = 0; i < projectiles.size(); i++)
+	{
+		//checks to see if projectile is active before running logic (temporary work around)
+		if (projectiles[i]->GetActive() == true)
+		{
+			projectiles[i]->Update(deltaTime);
+		}
+	}
 }
 
 // --------------------------------------------------------
@@ -308,6 +311,54 @@ void Game::Draw(float deltaTime, float totalTime)
 		0);
 
 	VertexShaderExternalData vsData;
+	//Render the ground
+	vsData.view = camera->GetViewMatrix();
+	vsData.projection = camera->GetProjectionMatrix();
+
+	//shader decleration
+	vsData.colorTint = groundEntity->GetMaterial()->GetColorTint();
+	vsData.world = groundEntity->GetTransform()->GetWorldMatrix();
+
+	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
+	context->Map(constBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+
+	memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
+
+	context->Unmap(constBufferVS.Get(), 0);
+
+	context->VSSetConstantBuffers(0, 1, constBufferVS.GetAddressOf());
+
+
+
+	// Set the vertex and pixel shaders to use for the next Draw() command
+	//  - These don't technically need to be set every frame
+	//  - Once you start applying different shaders to different objects,
+	//    you'll need to swap the current shaders before each draw
+	context->VSSetShader(groundEntity->GetMaterial()->GetVertexShader().Get(), 0, 0);
+	context->PSSetShader(groundEntity->GetMaterial()->GetPixelShader().Get(), 0, 0);
+
+
+	// Ensure the pipeline knows how to interpret the data (numbers)
+	// from the vertex buffer.  
+	// - If all of your 3D models use the exact same vertex layout,
+	//    this could simply be done once in Init()
+	// - However, this isn't always the case (but might be for this course)
+	context->IASetInputLayout(inputLayout.Get());
+
+
+	// Set buffers in the input assembler
+	//  - Do this ONCE PER OBJECT you're drawing, since each object might
+	//    have different geometry.
+	//  - for this demo, this step *could* simply be done once during Init(),
+	//    but I'm doing it here because it's often done multiple times per frame
+	//    in a larger application/game
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+
+
+	context->IASetVertexBuffers(0, 1, groundEntity->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+	context->IASetIndexBuffer(groundEntity->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+	context->DrawIndexed(groundEntity->GetMesh()->getIndecesies(), 0, 0);
 	for (int i = 0; i < 2; i++)
 	{
 		vsData.view = camera->GetViewMatrix();
@@ -357,6 +408,61 @@ void Game::Draw(float deltaTime, float totalTime)
 		context->IASetVertexBuffers(0, 1, players[i]->GetEntity()->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
 		context->IASetIndexBuffer(players[i]->GetEntity()->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
 		context->DrawIndexed(players[i]->GetEntity()->GetMesh()->getIndecesies(), 0, 0);
+	}
+	for (int i = 0; i < projectiles.size(); i++)
+	{
+		if (projectiles[i]->GetActive() == true)
+		{
+
+
+			vsData.view = camera->GetViewMatrix();
+			vsData.projection = camera->GetProjectionMatrix();
+
+			//shader decleration
+			vsData.colorTint = projectiles[i]->GetEntity()->GetMaterial()->GetColorTint();
+			vsData.world = projectiles[i]->GetEntity()->GetTransform()->GetWorldMatrix();
+
+			D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
+			context->Map(constBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+
+			memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
+
+			context->Unmap(constBufferVS.Get(), 0);
+
+			context->VSSetConstantBuffers(0, 1, constBufferVS.GetAddressOf());
+
+
+
+			// Set the vertex and pixel shaders to use for the next Draw() command
+			//  - These don't technically need to be set every frame
+			//  - Once you start applying different shaders to different objects,
+			//    you'll need to swap the current shaders before each draw
+			context->VSSetShader(projectiles[i]->GetEntity()->GetMaterial()->GetVertexShader().Get(), 0, 0);
+			context->PSSetShader(projectiles[i]->GetEntity()->GetMaterial()->GetPixelShader().Get(), 0, 0);
+
+
+			// Ensure the pipeline knows how to interpret the data (numbers)
+			// from the vertex buffer.  
+			// - If all of your 3D models use the exact same vertex layout,
+			//    this could simply be done once in Init()
+			// - However, this isn't always the case (but might be for this course)
+			context->IASetInputLayout(inputLayout.Get());
+
+
+			// Set buffers in the input assembler
+			//  - Do this ONCE PER OBJECT you're drawing, since each object might
+			//    have different geometry.
+			//  - for this demo, this step *could* simply be done once during Init(),
+			//    but I'm doing it here because it's often done multiple times per frame
+			//    in a larger application/game
+			UINT stride = sizeof(Vertex);
+			UINT offset = 0;
+
+
+			context->IASetVertexBuffers(0, 1, projectiles[i]->GetEntity()->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+			context->IASetIndexBuffer(projectiles[i]->GetEntity()->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+			context->DrawIndexed(projectiles[i]->GetEntity()->GetMesh()->getIndecesies(), 0, 0);
+		}
 	}
 
 	// Present the back buffer to the user

@@ -2,6 +2,7 @@
 #include "Entity.h"
 #include "Mesh.h"
 #include "Material.h"
+#include "Projectile.h"
 
 class Player
 {

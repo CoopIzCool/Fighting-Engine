@@ -29,14 +29,32 @@ void Projectile::Update(float dt)
 	if (isRight)
 	{
 		entity->GetTransform()->MoveRelative(dt, 0.0f, 0.0f);
+		if (entity->GetTransform()->getPosition().x > 15.0f)
+		{
+			active = false;
+		}
 	}
 	else
 	{
 		entity->GetTransform()->MoveRelative(dt * -1.0f, 0.0f, 0.0f);
+		if (entity->GetTransform()->getPosition().x < -15.0f)
+		{
+			active = false;
+		}
 	}
 }
 
 int Projectile::GetDamage()
 {
 	return damage;
+}
+
+bool Projectile::GetActive()
+{
+	return active;
+}
+
+Entity* Projectile::GetEntity()
+{
+	return entity;
 }

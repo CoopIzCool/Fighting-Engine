@@ -2,15 +2,18 @@
 #include "Entity.h"
 class Projectile
 {
-private:
+public:
 	Projectile(Entity* et, int dam,int direction);
 	~Projectile();
 	void Shot(int direction);
 	void Update(float dt);
 	int GetDamage();
-public:
+	bool GetActive();
+	Entity* GetEntity();
+private:
 	Entity* entity;
 	int damage;
 	bool isRight = true;
+	bool active = true;
 };
 

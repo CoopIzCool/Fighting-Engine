@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Material.h"
 #include "Player.h"
+#include "Projectile.h"
 #include <vector>
 
 
@@ -48,7 +49,7 @@ private:
 	//meshes
 	Mesh* mesh1;
 	Mesh* mesh2;
-	//Mesh* mesh3;
+	Mesh* groundMesh;
 	
 	//shaders
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constBufferVS;
@@ -56,14 +57,18 @@ private:
 	//entities
 	Entity* entity1;
 	Entity* entity2;
+	Entity* groundEntity;
 	
-
+	//players
 	Player* p1;
 	Player* p2;
 	Player* players[2];
-	Camera* camera;
 
+	Camera* camera;
+	//projectiles
+	std::vector<Projectile*> projectiles;
 	Material* m1;
 	Material* m2;
+	Material* groundMat;
 };
 

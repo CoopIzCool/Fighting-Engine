@@ -1,4 +1,5 @@
 #include "Player.h"
+#include <iostream>
 
 
 Player::Player(Entity* et, bool p2)
@@ -40,10 +41,22 @@ void Player::Update(float dt)
 		if (GetAsyncKeyState('A') & 0x8000)
 		{
 			entity->GetTransform()->MoveRelative(-speed, 0, 0);
+			if (entity->GetTransform()->getPosition().x < -1.2f)
+			{
+				entity->GetTransform()->setPosition(-1.2f, tf.getPosition().y, tf.getPosition().z);
+			}
 		}
 		if (GetAsyncKeyState('D') & 0x8000)
 		{
 			entity->GetTransform()->MoveRelative(speed, 0, 0);
+			if (entity->GetTransform()->getPosition().x > 1.35f)
+			{
+				entity->GetTransform()->setPosition(1.38f, tf.getPosition().y, tf.getPosition().z);
+			}
+		}
+		if (GetAsyncKeyState(VK_SPACE) & 0x8000)
+		{
+			std::cout << entity->GetTransform()->getPosition().x;
 		}
 	}
 	//for p2
