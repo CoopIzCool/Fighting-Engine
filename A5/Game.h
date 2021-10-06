@@ -50,6 +50,7 @@ private:
 	Mesh* mesh1;
 	Mesh* mesh2;
 	Mesh* groundMesh;
+	Mesh* projMesh;
 	
 	//shaders
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constBufferVS;
@@ -58,6 +59,7 @@ private:
 	Entity* entity1;
 	Entity* entity2;
 	Entity* groundEntity;
+	Entity* projEntity;
 	
 	//players
 	Player* p1;
@@ -70,5 +72,6 @@ private:
 	Material* m1;
 	Material* m2;
 	Material* groundMat;
+
 };
 

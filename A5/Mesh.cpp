@@ -35,6 +35,9 @@ Mesh::Mesh(Vertex* verts, int numVerts, unsigned int* indicies, int numIndicies,
 	initialIndexData.pSysMem = indicies;
 
 	deviceObject->CreateBuffer(&ibd, &initialIndexData, indexBuffer.GetAddressOf());
+
+	//check the bounds for collision boxes
+	GetBounds(verts);
 }
 
 
@@ -42,6 +45,39 @@ Mesh::Mesh(Vertex* verts, int numVerts, unsigned int* indicies, int numIndicies,
 Mesh::~Mesh()
 {
 	
+}
+
+
+
+void Mesh::GetBounds(Vertex* verts)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		if (verts[i].Position.x > maxBounds.x)
+		{
+			maxBounds.x = verts[i].Position.x;
+		}
+		else if (verts[i].Position.x < minBounds.x)
+		{
+			minBounds.x = verts[i].Position.x;
+		}
+		if (verts[i].Position.y > maxBounds.y)
+		{
+			maxBounds.y = verts[i].Position.y;
+		}
+		else if (verts[i].Position.y < minBounds.y)
+		{
+			minBounds.y = verts[i].Position.y;
+		}
+		if (verts[i].Position.z > maxBounds.z)
+		{
+			maxBounds.z = verts[i].Position.z;
+		}
+		else if (verts[i].Position.z < minBounds.z)
+		{
+			minBounds.z = verts[i].Position.z;
+		}
+	}
 }
 
 //properties
@@ -58,4 +94,14 @@ Microsoft::WRL::ComPtr<ID3D11Buffer> Mesh::GetIndexBuffer()
 int Mesh::getIndecesies()
 {
 	return indexes;
+}
+
+DirectX::XMFLOAT3 Mesh::GetMinBounds()
+{
+	return minBounds;
+}
+
+DirectX::XMFLOAT3 Mesh::GetMaxBounds()
+{
+	return maxBounds;
 }

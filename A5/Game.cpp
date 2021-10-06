@@ -52,22 +52,26 @@ Game::~Game()
 	delete(mesh1);
 	delete(mesh2);
 	delete(groundMesh);
+	delete(projMesh);
 
 	delete(p1);
 	delete(entity1);
 	delete(p2);
 	delete(entity2);
 	delete(groundEntity);
-
+	delete(projEntity);
 	delete(camera);
 
 	delete(m1);
 	delete(m2);
 	delete(groundMat);
-	for(int i = projectiles.size() - 1; i < 0; i--)
+	
+	
+	for(int i = projectiles.size() - 1;i  < 0; i--)
 	{
 		delete(projectiles[i]);
 	}
+	
 }
 
 // --------------------------------------------------------
@@ -234,12 +238,21 @@ void Game::CreateBasicGeometry()
 
 	};
 
+	Vertex projVerts[] = 
+	{
+	{ XMFLOAT3(-0.05f, +0.05f, +0.0f), red },
+	{ XMFLOAT3(+0.05f, +0.05f, +0.0f), red },
+	{ XMFLOAT3(-0.05f, -0.05f, +0.0f), red },
+	{ XMFLOAT3(+0.05f, -0.05f, +0.0f), blue },
+
+	};
 
 	unsigned int indices[] = { 0,1,2,0,2,3 };
 
 	mesh1 = new Mesh(vertices1, 4, indices, 6, device);
 	mesh2 = new Mesh(vertices2, 4, indices, 6, device);
 	groundMesh = new Mesh(groundVerts, 4, indices, 6, device);
+	projMesh = new Mesh(projVerts, 4, indices, 6, device);
 
 	m1 = new Material({ 0.3f,0.8f,0.6f,1.0f }, pixelShader, vertexShader);
 	m2 = new Material({ 0.9f,0.2f,0.2f,1.0f }, pixelShader, vertexShader);
@@ -248,6 +261,7 @@ void Game::CreateBasicGeometry()
 	entity1 = new Entity(mesh1,m1);
 	entity2 = new Entity(mesh2,m2);
 	groundEntity = new Entity(groundMesh, groundMat);
+	projEntity = new Entity(projMesh, groundMat);
 
 
 	p1 = new Player(entity1, 100, false, vertices1);
@@ -281,6 +295,13 @@ void Game::Update(float deltaTime, float totalTime)
 	p1->Update(deltaTime);
 	p2->Update(deltaTime);
 	
+	if (GetAsyncKeyState('C') & 0x8000)
+	{
+		Projectile* proj = new Projectile(projEntity, 10, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x,
+			p1->GetEntity()->GetTransform()->getPosition().y);
+		projectiles.push_back(proj);
+	}
+
 	for (int i = 0; i < projectiles.size(); i++)
 	{
 		//checks to see if projectile is active before running logic (temporary work around)
@@ -289,6 +310,8 @@ void Game::Update(float deltaTime, float totalTime)
 			projectiles[i]->Update(deltaTime);
 		}
 	}
+	//check to see if projectile should be fired from p1
+
 }
 
 // --------------------------------------------------------
@@ -411,7 +434,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	}
 	for (int i = 0; i < projectiles.size(); i++)
 	{
-		if (projectiles[i]->GetActive() == true)
+		if (projectiles[i]->GetActive() == true || projectiles[i]->GetActive() == false)
 		{
 
 

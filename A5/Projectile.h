@@ -3,9 +3,9 @@
 class Projectile
 {
 public:
-	Projectile(Entity* et, int dam,int direction);
+	Projectile(Entity* et, int dam, float p1X,float p2X, float height);
 	~Projectile();
-	void Shot(int direction);
+	void Shot(float p1X, float p2X,float height);
 	void Update(float dt);
 	int GetDamage();
 	bool GetActive();

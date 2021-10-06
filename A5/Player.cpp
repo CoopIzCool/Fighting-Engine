@@ -11,7 +11,7 @@ Player::Player(Entity* et, int hitP, bool p2, Vertex* verts)
 	entity = et;
 	hitpoints = hitP;
 	isP2 = p2;
-	GetBounds(verts);
+	//GetBounds(verts);
 }
 
 Player::~Player()
@@ -78,10 +78,19 @@ void Player::Update(float dt)
 		if (GetAsyncKeyState('J') & 0x8000)
 		{
 			entity->GetTransform()->MoveRelative(-speed, 0, 0);
+			if (entity->GetTransform()->getPosition().x < -1.5f)
+			{
+				entity->GetTransform()->setPosition(-1.5f, tf.getPosition().y, tf.getPosition().z);
+
+			}
 		}
 		if (GetAsyncKeyState('L') & 0x8000)
 		{
 			entity->GetTransform()->MoveRelative(speed, 0, 0);
+			if (entity->GetTransform()->getPosition().x > 1.08f)
+			{
+				entity->GetTransform()->setPosition(1.08f, tf.getPosition().y, tf.getPosition().z);
+			}
 		}
 	}
 
