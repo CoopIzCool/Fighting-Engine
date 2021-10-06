@@ -37,7 +37,7 @@ Mesh::Mesh(Vertex* verts, int numVerts, unsigned int* indicies, int numIndicies,
 	deviceObject->CreateBuffer(&ibd, &initialIndexData, indexBuffer.GetAddressOf());
 
 	//check the bounds for collision boxes
-	GetBounds(verts);
+	SetBounds(verts);
 }
 
 
@@ -49,7 +49,7 @@ Mesh::~Mesh()
 
 
 
-void Mesh::GetBounds(Vertex* verts)
+void Mesh::SetBounds(Vertex* verts)
 {
 	for (int i = 0; i < 4; i++)
 	{

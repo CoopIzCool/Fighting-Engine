@@ -67,7 +67,7 @@ Game::~Game()
 	delete(groundMat);
 	
 	
-	for(int i = projectiles.size() - 1;i  < 0; i--)
+	for(int i = 0;i  < projectiles.size() ; i++)
 	{
 		delete(projectiles[i]);
 	}
@@ -103,6 +103,7 @@ void Game::Init()
 	cbDesc.Usage = D3D11_USAGE_DYNAMIC;
 
 	device->CreateBuffer(&cbDesc, 0, constBufferVS.GetAddressOf());
+	PrintHealth();
 }
 
 // --------------------------------------------------------
@@ -295,22 +296,59 @@ void Game::Update(float deltaTime, float totalTime)
 	p1->Update(deltaTime);
 	p2->Update(deltaTime);
 	
-	if (GetAsyncKeyState('C') & 0x8000)
+	//projectile firing for 1
+	if (GetAsyncKeyState('C') & 0x8000 && !fired1)
 	{
 		Projectile* proj = new Projectile(projEntity, 10, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x,
-			p1->GetEntity()->GetTransform()->getPosition().y);
+			p1->GetEntity()->GetTransform()->getPosition().y, true);
 		projectiles.push_back(proj);
+		fired1 = true;
 	}
+	fired1 = GetAsyncKeyState('C');
 
+	//projectile firing for 2
+	if (GetAsyncKeyState('N') & 0x8000 && !fired2)
+	{
+		Projectile* proj = new Projectile(projEntity, 10, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x,
+			p2->GetEntity()->GetTransform()->getPosition().y, false);
+		projectiles.push_back(proj);
+		fired2= true;
+	}
+	fired2 = GetAsyncKeyState('N');
+
+	//update projectiles
 	for (int i = 0; i < projectiles.size(); i++)
 	{
 		//checks to see if projectile is active before running logic (temporary work around)
 		if (projectiles[i]->GetActive() == true)
 		{
 			projectiles[i]->Update(deltaTime);
+			//checks to see whehter collision should be checked with p1 or p2
+			if (projectiles[i]->GetOwner())
+			{
+				//collision check for p2
+				if (projectiles[i]->isColliding(p2))
+				{
+					p2->Damage(projectiles[i]->GetDamage());
+					projectiles[i]->SetActive(false);
+					PrintHealth()
+				}
+			}
+			
+			else
+			{
+				//collision check for p1
+				if (projectiles[i]->isColliding(p1))
+				{
+					p1->Damage(projectiles[i]->GetDamage());
+					projectiles[i]->SetActive(false);
+					PrintHealth();
+				}
+			}
 		}
 	}
-	//check to see if projectile should be fired from p1
+
+
 
 }
 
@@ -496,4 +534,10 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Due to the usage of a more sophisticated swap chain,
 	// the render target must be re-bound after every call to Present()
 	context->OMSetRenderTargets(1, backBufferRTV.GetAddressOf(), depthStencilView.Get());
+}
+
+void Game::PrintHealth()
+{
+	std::cout << std::flush;
+	std::cout << "Player 1 Health:  " << p1->GetHealth() << "Player 2 Health:  " << p2->GetHealth();
 }

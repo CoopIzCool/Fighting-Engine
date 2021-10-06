@@ -10,6 +10,8 @@
 #include "Player.h"
 #include "Projectile.h"
 #include <vector>
+#include <iostream>
+#include <stdlib.h>
 
 
 class Game 
@@ -26,6 +28,7 @@ public:
 	void OnResize();
 	void Update(float deltaTime, float totalTime);
 	void Draw(float deltaTime, float totalTime);
+	void PrintHealth();
 
 private:
 
@@ -73,5 +76,8 @@ private:
 	Material* m2;
 	Material* groundMat;
 
+	//player fired projectile states
+	bool fired1 = false;
+	bool fired2 = false;
 };
 

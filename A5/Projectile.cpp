@@ -1,10 +1,11 @@
-#include "Projectile.h"
+#include "Player.h"
 
-Projectile::Projectile(Entity* et, int dam,float p1X, float p2X,float height)
+Projectile::Projectile(Entity* et, int dam,float p1X, float p2X,float height, bool owner)
 {
 	entity = et;
 	damage = dam;
 	Shot(p1X,p2X,height);
+	isP1Owner = owner;
 }
 
 Projectile::~Projectile()
@@ -60,4 +61,33 @@ bool Projectile::GetActive()
 Entity* Projectile::GetEntity()
 {
 	return entity;
+}
+
+bool Projectile::GetOwner()
+{
+	return isP1Owner;
+}
+
+void Projectile::SetActive(bool a)
+{
+	active = a;
+}
+
+bool Projectile::isColliding(Player* player)
+{
+	DirectX::XMFLOAT3 minPlayer = player->GetEntity()->GetMesh()->GetMinBounds();
+	DirectX::XMFLOAT3 maxPlayer = player->GetEntity()->GetMesh()->GetMaxBounds();
+	DirectX::XMFLOAT3 minProj = this->GetEntity()->GetMesh()->GetMinBounds();
+	DirectX::XMFLOAT3 maxProj = this->GetEntity()->GetMesh()->GetMaxBounds();
+
+	//compare the bounds and see if they interesect
+	if (minPlayer.x <= maxProj.x && maxPlayer.x >= minProj.x &&
+		minPlayer.y <= maxProj.y && maxPlayer.y >= minProj.y )
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }

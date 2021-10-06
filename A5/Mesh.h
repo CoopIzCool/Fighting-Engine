@@ -12,7 +12,7 @@ public:
 		int numIndicies, Microsoft::WRL::ComPtr<ID3D11Device> deviceObject);
 	~Mesh();
 
-	void GetBounds(Vertex* verts);
+	void SetBounds(Vertex* verts);
 	Microsoft::WRL::ComPtr<ID3D11Buffer> GetVertexBuffer();
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> GetIndexBuffer();
