@@ -26,9 +26,17 @@ void Player::Update(float dt)
 		//directions for p1
 		if (!isP2)
 		{
-			if (GetAsyncKeyState('W') & 0x8000)
+
+
+			if (GetAsyncKeyState('W') & 0x8000 && (!freeFall))
 			{
 				entity->GetTransform()->MoveRelative(0, speed, 0);
+				if (jumpFrames == 0)
+				{
+					jumpPressed = true;
+				}
+				jumpFrames++;
+				
 			}
 			else if (tf.getPosition().y > 0)
 			{
@@ -37,11 +45,15 @@ void Player::Update(float dt)
 			else
 			{
 				entity->GetTransform()->setPosition(tf.getPosition().x, 0, tf.getPosition().z);
+				freeFall = false;
+				jumpFrames = 0;
+				jumpPressed = false;
 			}
 
 			if (GetAsyncKeyState('A') & 0x8000)
 			{
 				entity->GetTransform()->MoveRelative(-speed, 0, 0);
+				//wall collision
 				if (entity->GetTransform()->getPosition().x < -1.2f)
 				{
 					entity->GetTransform()->setPosition(-1.2f, tf.getPosition().y, tf.getPosition().z);
@@ -50,18 +62,37 @@ void Player::Update(float dt)
 			if (GetAsyncKeyState('D') & 0x8000)
 			{
 				entity->GetTransform()->MoveRelative(speed, 0, 0);
+				//wall collision
 				if (entity->GetTransform()->getPosition().x > 1.35f)
 				{
 					entity->GetTransform()->setPosition(1.38f, tf.getPosition().y, tf.getPosition().z);
 				}
 			}
+			//turns off the abillity tojump after the player has jumped for a period of time or if the jump button is let go
+			if (!freeFall && !GetAsyncKeyState('W') && jumpPressed)
+			{
+				freeFall = true;
+				jumpFrames = 0;
+			}
+			if (!freeFall && jumpFrames >= 10 )
+			{
+				freeFall = true;
+				jumpFrames = 0;
+			}
+
+
 		}
 		//for p2
 		else
 		{
-			if (GetAsyncKeyState('I') & 0x8000)
+			if (GetAsyncKeyState('I') & 0x8000 && (!freeFall))
 			{
 				entity->GetTransform()->MoveRelative(0, speed, 0);
+				if (jumpFrames == 0)
+				{
+					jumpPressed = true;
+				}
+				jumpFrames++;
 			}
 			else if (tf.getPosition().y > 0)
 			{
@@ -70,6 +101,9 @@ void Player::Update(float dt)
 			else
 			{
 				entity->GetTransform()->setPosition(tf.getPosition().x, 0, tf.getPosition().z);
+				freeFall = false;
+				jumpFrames = 0;
+				jumpPressed = false;
 			}
 
 			if (GetAsyncKeyState('J') & 0x8000)
@@ -88,6 +122,17 @@ void Player::Update(float dt)
 				{
 					entity->GetTransform()->setPosition(1.08f, tf.getPosition().y, tf.getPosition().z);
 				}
+			}
+			//jumping logic for p2
+			if (!freeFall && !GetAsyncKeyState('I') && jumpPressed)
+			{
+				freeFall = true;
+				jumpFrames = 0;
+			}
+			if (!freeFall && jumpFrames >= 10)
+			{
+				freeFall = true;
+				jumpFrames = 0;
 			}
 		}
 	}

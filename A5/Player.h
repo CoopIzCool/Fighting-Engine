@@ -22,5 +22,9 @@ private:
 	DirectX::XMFLOAT3 minBounds = DirectX::XMFLOAT3(FLT_MIN, FLT_MIN, FLT_MIN);
 	DirectX::XMFLOAT3 maxBounds = DirectX::XMFLOAT3(FLT_MAX, FLT_MAX, FLT_MAX);
 	bool alive = true;
+	int jumpFrames = 0;
+	bool freeFall = false;
+	bool jumpPressed = false;
+
 };
 

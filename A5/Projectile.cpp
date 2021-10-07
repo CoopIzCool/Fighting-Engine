@@ -1,5 +1,6 @@
 #include "Player.h"
 
+using namespace ::DirectX;
 Projectile::Projectile(Entity* et, int dam,float p1X, float p2X,float height, bool owner)
 {
 	entity = et;
@@ -48,6 +49,34 @@ void Projectile::Update(float dt)
 	}
 }
 
+bool Projectile::isColliding(Entity* playerEt)
+{
+	//adjust min and max bounds with the players position
+	XMVECTOR playMin = XMVectorAdd(XMLoadFloat3(&playerEt->GetMesh()->GetMinBounds()), XMLoadFloat3(&playerEt->GetTransform()->getPosition()));
+	XMVECTOR playMax = XMVectorAdd(XMLoadFloat3(&playerEt->GetMesh()->GetMaxBounds()), XMLoadFloat3(&playerEt->GetTransform()->getPosition()));
+	XMVECTOR thisMin = XMVectorAdd(XMLoadFloat3(&entity->GetMesh()->GetMinBounds()), XMLoadFloat3(&entity->GetTransform()->getPosition()));
+	XMVECTOR thisMax = XMVectorAdd(XMLoadFloat3(&entity->GetMesh()->GetMaxBounds()), XMLoadFloat3(&entity->GetTransform()->getPosition()));
+	XMFLOAT3 minPlayer;
+	XMFLOAT3 maxPlayer;
+	XMFLOAT3 minProj;
+	XMFLOAT3 maxProj;
+
+	XMStoreFloat3(&minPlayer, playMin);
+	XMStoreFloat3(&maxPlayer, playMax);
+	XMStoreFloat3(&minProj, thisMin);
+	XMStoreFloat3(&maxProj, thisMax);
+	//compare the bounds and see if they interesect
+	if (minPlayer.x <= maxProj.x && maxPlayer.x >= minProj.x &&
+		minPlayer.y <= maxProj.y && maxPlayer.y >= minProj.y)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 int Projectile::GetDamage()
 {
 	return damage;
@@ -73,21 +102,4 @@ void Projectile::SetActive(bool a)
 	active = a;
 }
 
-bool Projectile::isColliding(Player* player)
-{
-	DirectX::XMFLOAT3 minPlayer = player->GetEntity()->GetMesh()->GetMinBounds();
-	DirectX::XMFLOAT3 maxPlayer = player->GetEntity()->GetMesh()->GetMaxBounds();
-	DirectX::XMFLOAT3 minProj = this->GetEntity()->GetMesh()->GetMinBounds();
-	DirectX::XMFLOAT3 maxProj = this->GetEntity()->GetMesh()->GetMaxBounds();
 
-	//compare the bounds and see if they interesect
-	if (minPlayer.x <= maxProj.x && maxPlayer.x >= minProj.x &&
-		minPlayer.y <= maxProj.y && maxPlayer.y >= minProj.y )
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}

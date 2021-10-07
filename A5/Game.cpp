@@ -327,18 +327,18 @@ void Game::Update(float deltaTime, float totalTime)
 			if (projectiles[i]->GetOwner())
 			{
 				//collision check for p2
-				if (projectiles[i]->isColliding(p2))
+				if (projectiles[i]->isColliding(p2->GetEntity()))
 				{
 					p2->Damage(projectiles[i]->GetDamage());
 					projectiles[i]->SetActive(false);
-					PrintHealth()
+					PrintHealth();
 				}
 			}
 			
 			else
 			{
 				//collision check for p1
-				if (projectiles[i]->isColliding(p1))
+				if (projectiles[i]->isColliding(p1->GetEntity()))
 				{
 					p1->Damage(projectiles[i]->GetDamage());
 					projectiles[i]->SetActive(false);
@@ -472,7 +472,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	}
 	for (int i = 0; i < projectiles.size(); i++)
 	{
-		if (projectiles[i]->GetActive() == true || projectiles[i]->GetActive() == false)
+		if (projectiles[i]->GetActive() == true)
 		{
 
 
@@ -539,5 +539,5 @@ void Game::Draw(float deltaTime, float totalTime)
 void Game::PrintHealth()
 {
 	std::cout << std::flush;
-	std::cout << "Player 1 Health:  " << p1->GetHealth() << "Player 2 Health:  " << p2->GetHealth();
+	std::cout << "Player 1 Health:  " << p1->GetHealth() << "  Player 2 Health:  " << p2->GetHealth()<<std::endl;
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "Entity.h"
 #include "Player.h"
+#include <DirectXMath.h>
 class Projectile
 {
 public:
@@ -8,12 +9,13 @@ public:
 	~Projectile();
 	void Shot(float p1X, float p2X,float height);
 	void Update(float dt);
+	bool isColliding(Entity* playerEt);
 	int GetDamage();
 	bool GetActive();
 	Entity* GetEntity();
 	bool GetOwner();
 	void SetActive(bool a);
-	bool isColliding(Player* player);
+	
 private:
 	Entity* entity;
 	int damage;
