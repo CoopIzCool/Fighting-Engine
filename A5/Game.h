@@ -12,6 +12,7 @@
 #include <vector>
 #include <iostream>
 #include <stdlib.h>
+#include <queue>
 
 
 class Game 
@@ -68,10 +69,13 @@ private:
 	Player* p1;
 	Player* p2;
 	Player* players[2];
+	
 
 	Camera* camera;
 	//projectiles
 	std::vector<Projectile*> projectiles;
+	std::queue<Projectile*> projQueue;
+	
 	Material* m1;
 	Material* m2;
 	Material* groundMat;

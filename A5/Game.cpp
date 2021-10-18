@@ -262,9 +262,13 @@ void Game::CreateBasicGeometry()
 	entity1 = new Entity(mesh1,m1);
 	entity2 = new Entity(mesh2,m2);
 	groundEntity = new Entity(groundMesh, groundMat);
+
 	projEntity = new Entity(projMesh, groundMat);
 
-
+	for (int i = 0; i < 10; i++)
+	{
+		Projectile* proj = new Projectile(projEntity, 10);
+	}
 	p1 = new Player(entity1, 100, false, vertices1);
 	p2 = new Player(entity2, 100, true, vertices2);
 	players[0] = p1;

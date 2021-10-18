@@ -6,6 +6,7 @@ class Projectile
 {
 public:
 	Projectile(Entity* et, int dam, float p1X,float p2X, float height, bool owner);
+	Projectile(Entity* et, int dam);
 	~Projectile();
 	void Shot(float p1X, float p2X,float height);
 	void Update(float dt);
@@ -15,6 +16,7 @@ public:
 	Entity* GetEntity();
 	bool GetOwner();
 	void SetActive(bool a);
+	void SetOwner(bool o);
 	
 private:
 	Entity* entity;

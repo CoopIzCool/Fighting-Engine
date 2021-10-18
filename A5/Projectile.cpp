@@ -9,6 +9,12 @@ Projectile::Projectile(Entity* et, int dam,float p1X, float p2X,float height, bo
 	isP1Owner = owner;
 }
 
+Projectile::Projectile(Entity* et, int dam)
+{
+	entity = et;
+	damage = dam;
+}
+
 Projectile::~Projectile()
 {
 }
@@ -100,6 +106,11 @@ bool Projectile::GetOwner()
 void Projectile::SetActive(bool a)
 {
 	active = a;
+}
+
+void Projectile::SetOwner(bool o)
+{
+	isP1Owner = 0;
 }
 
 
