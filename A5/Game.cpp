@@ -268,6 +268,7 @@ void Game::CreateBasicGeometry()
 	for (int i = 0; i < 10; i++)
 	{
 		Projectile* proj = new Projectile(projEntity, 10);
+		projQueue.push(proj);
 	}
 	p1 = new Player(entity1, 100, false, vertices1);
 	p2 = new Player(entity2, 100, true, vertices2);
@@ -303,20 +304,35 @@ void Game::Update(float deltaTime, float totalTime)
 	//projectile firing for 1
 	if (GetAsyncKeyState('C') & 0x8000 && !fired1)
 	{
+		/*
 		Projectile* proj = new Projectile(projEntity, 10, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x,
 			p1->GetEntity()->GetTransform()->getPosition().y, true);
 		projectiles.push_back(proj);
 		fired1 = true;
+		*/
+		projQueue.front()->Shot(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x,
+			p1->GetEntity()->GetTransform()->getPosition().y);
+		projQueue.front()->SetOwner(true);
+		projectiles.push_back(projQueue.front());
+		projQueue.pop();
+
 	}
 	fired1 = GetAsyncKeyState('C');
 
 	//projectile firing for 2
 	if (GetAsyncKeyState('N') & 0x8000 && !fired2)
 	{
+		/*
 		Projectile* proj = new Projectile(projEntity, 10, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x,
 			p2->GetEntity()->GetTransform()->getPosition().y, false);
 		projectiles.push_back(proj);
 		fired2= true;
+		*/
+		projQueue.front()->Shot(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x,
+			p2->GetEntity()->GetTransform()->getPosition().y);
+		projQueue.front()->SetOwner(false);
+		projectiles.push_back(projQueue.front());
+		projQueue.pop();
 	}
 	fired2 = GetAsyncKeyState('N');
 
@@ -336,6 +352,7 @@ void Game::Update(float deltaTime, float totalTime)
 					p2->Damage(projectiles[i]->GetDamage());
 					projectiles[i]->SetActive(false);
 					PrintHealth();
+					projQueue.push(projectiles[i]);
 				}
 			}
 			
@@ -347,6 +364,7 @@ void Game::Update(float deltaTime, float totalTime)
 					p1->Damage(projectiles[i]->GetDamage());
 					projectiles[i]->SetActive(false);
 					PrintHealth();
+					projQueue.push(projectiles[i]);
 				}
 			}
 		}
