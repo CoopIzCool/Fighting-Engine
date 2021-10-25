@@ -55,6 +55,7 @@ private:
 	Mesh* mesh2;
 	Mesh* groundMesh;
 	Mesh* projMesh;
+
 	
 	//shaders
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constBufferVS;
@@ -84,5 +85,6 @@ private:
 	bool fired1 = false;
 	bool fired2 = false;
 
+	//hitbox storages
 };
 

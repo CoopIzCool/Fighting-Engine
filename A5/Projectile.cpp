@@ -1,6 +1,7 @@
 #include "Player.h"
 
 using namespace ::DirectX;
+
 Projectile::Projectile(Entity* et, int dam,float p1X, float p2X,float height, bool owner)
 {
 	entity = et;
@@ -57,11 +58,18 @@ void Projectile::Update(float dt)
 
 bool Projectile::isColliding(Entity* playerEt)
 {
+	
+	XMFLOAT3 priorPlayerMin = playerEt->GetMesh()->GetMinBounds();
+	XMFLOAT3 priorPlayerMax = playerEt->GetMesh()->GetMaxBounds();
+	XMFLOAT3 priorEntMin = entity->GetMesh()->GetMinBounds();
+	XMFLOAT3 priorEntMax = entity->GetMesh()->GetMaxBounds();
+	XMFLOAT3 playerPos = playerEt->GetTransform()->getPosition();
+	XMFLOAT3 etPos = entity->GetTransform()->getPosition();
 	//adjust min and max bounds with the players position
-	XMVECTOR playMin = XMVectorAdd(XMLoadFloat3(&playerEt->GetMesh()->GetMinBounds()), XMLoadFloat3(&playerEt->GetTransform()->getPosition()));
-	XMVECTOR playMax = XMVectorAdd(XMLoadFloat3(&playerEt->GetMesh()->GetMaxBounds()), XMLoadFloat3(&playerEt->GetTransform()->getPosition()));
-	XMVECTOR thisMin = XMVectorAdd(XMLoadFloat3(&entity->GetMesh()->GetMinBounds()), XMLoadFloat3(&entity->GetTransform()->getPosition()));
-	XMVECTOR thisMax = XMVectorAdd(XMLoadFloat3(&entity->GetMesh()->GetMaxBounds()), XMLoadFloat3(&entity->GetTransform()->getPosition()));
+	XMVECTOR playMin = XMVectorAdd(XMLoadFloat3(&priorPlayerMin), XMLoadFloat3(&playerPos));
+	XMVECTOR playMax = XMVectorAdd(XMLoadFloat3(&priorPlayerMax), XMLoadFloat3(&playerPos));
+	XMVECTOR thisMin = XMVectorAdd(XMLoadFloat3(&priorEntMin), XMLoadFloat3(&etPos));
+	XMVECTOR thisMax = XMVectorAdd(XMLoadFloat3(&priorEntMax), XMLoadFloat3(&etPos));
 	XMFLOAT3 minPlayer;
 	XMFLOAT3 maxPlayer;
 	XMFLOAT3 minProj;

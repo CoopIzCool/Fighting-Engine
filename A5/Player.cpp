@@ -6,7 +6,7 @@ Player::Player(Entity* et, bool p2)
 {
 }
 
-Player::Player(Entity* et, int hitP, bool p2, Vertex* verts)
+Player::Player(Entity* et, int hitP, bool p2)
 {
 	entity = et;
 	hitpoints = hitP;

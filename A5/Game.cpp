@@ -69,6 +69,8 @@ Game::~Game()
 	
 	for(int i = 0;i  < projectiles.size() ; i++)
 	{
+		//delete(projectiles[i]->GetEntity()->GetMesh());
+		//delete(projectiles[i]->GetEntity());
 		delete(projectiles[i]);
 	}
 	
@@ -287,8 +289,8 @@ void Game::CreateBasicGeometry()
 		Projectile* proj = new Projectile(projEntity, 10);
 		projQueue.push(proj);
 	}
-	p1 = new Player(entity1, 100, false, vertices1);
-	p2 = new Player(entity2, 100, true, vertices2);
+	p1 = new Player(entity1, 100, false);
+	p2 = new Player(entity2, 100, true);
 	players[0] = p1;
 	players[1] = p2;
 
@@ -385,6 +387,7 @@ void Game::Update(float deltaTime, float totalTime)
 					projectiles[i]->SetActive(false);
 					PrintHealth();
 					projQueue.push(projectiles[i]);
+					projectiles.erase(projectiles.begin() + i);
 				}
 			}
 		}
@@ -412,6 +415,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		0);
 
 	VertexShaderExternalData vsData;
+
 	//Render the ground
 	vsData.view = camera->GetViewMatrix();
 	vsData.projection = camera->GetProjectionMatrix();
@@ -429,30 +433,11 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	context->VSSetConstantBuffers(0, 1, constBufferVS.GetAddressOf());
 
-
-
-	// Set the vertex and pixel shaders to use for the next Draw() command
-	//  - These don't technically need to be set every frame
-	//  - Once you start applying different shaders to different objects,
-	//    you'll need to swap the current shaders before each draw
 	context->VSSetShader(groundEntity->GetMaterial()->GetVertexShader().Get(), 0, 0);
 	context->PSSetShader(groundEntity->GetMaterial()->GetPixelShader().Get(), 0, 0);
 
-
-	// Ensure the pipeline knows how to interpret the data (numbers)
-	// from the vertex buffer.  
-	// - If all of your 3D models use the exact same vertex layout,
-	//    this could simply be done once in Init()
-	// - However, this isn't always the case (but might be for this course)
 	context->IASetInputLayout(inputLayout.Get());
 
-
-	// Set buffers in the input assembler
-	//  - Do this ONCE PER OBJECT you're drawing, since each object might
-	//    have different geometry.
-	//  - for this demo, this step *could* simply be done once during Init(),
-	//    but I'm doing it here because it's often done multiple times per frame
-	//    in a larger application/game
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 
@@ -460,6 +445,8 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->IASetVertexBuffers(0, 1, groundEntity->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
 	context->IASetIndexBuffer(groundEntity->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
 	context->DrawIndexed(groundEntity->GetMesh()->getIndecesies(), 0, 0);
+
+	//draw players
 	for (int i = 0; i < 2; i++)
 	{
 		vsData.view = camera->GetViewMatrix();
@@ -563,6 +550,12 @@ void Game::Draw(float deltaTime, float totalTime)
 			context->IASetVertexBuffers(0, 1, projectiles[i]->GetEntity()->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
 			context->IASetIndexBuffer(projectiles[i]->GetEntity()->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
 			context->DrawIndexed(projectiles[i]->GetEntity()->GetMesh()->getIndecesies(), 0, 0);
+			
+			if (projectiles.size() > 3)
+			{
+				std::cout << "three";
+			}
+			
 		}
 	}
 
