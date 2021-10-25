@@ -118,7 +118,7 @@ void Projectile::SetActive(bool a)
 
 void Projectile::SetOwner(bool o)
 {
-	isP1Owner = 0;
+	isP1Owner = o;
 }
 
 
