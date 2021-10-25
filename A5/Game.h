@@ -83,5 +83,6 @@ private:
 	//player fired projectile states
 	bool fired1 = false;
 	bool fired2 = false;
+
 };
 

@@ -72,6 +72,13 @@ Game::~Game()
 		delete(projectiles[i]);
 	}
 	
+	for (int i = 0;i < projQueue.size(); i++)
+	{
+		//delete(projQueue.front());
+		projQueue.pop();
+
+	}
+	
 }
 
 // --------------------------------------------------------
@@ -243,8 +250,8 @@ void Game::CreateBasicGeometry()
 	{
 	{ XMFLOAT3(-0.05f, +0.05f, +0.0f), red },
 	{ XMFLOAT3(+0.05f, +0.05f, +0.0f), red },
-	{ XMFLOAT3(-0.05f, -0.05f, +0.0f), red },
-	{ XMFLOAT3(+0.05f, -0.05f, +0.0f), blue },
+	{ XMFLOAT3(+0.05f, -0.05f, +0.0f), red },
+	{ XMFLOAT3(-0.05f, -0.05f, +0.0f), blue },
 
 	};
 
@@ -267,6 +274,16 @@ void Game::CreateBasicGeometry()
 
 	for (int i = 0; i < 10; i++)
 	{
+		Vertex vertsProj[] =
+		{
+		{ XMFLOAT3(-0.05f, +0.05f, +0.0f), red },
+		{ XMFLOAT3(+0.05f, +0.05f, +0.0f), red },
+		{ XMFLOAT3(+0.05f, -0.05f, +0.0f), red },
+		{ XMFLOAT3(-0.05f, -0.05f, +0.0f), blue },
+
+		};
+		Mesh* meshproj = new Mesh(vertsProj, 4, indices, 6, device);
+		Entity* etProj = new Entity(projMesh, groundMat);
 		Projectile* proj = new Projectile(projEntity, 10);
 		projQueue.push(proj);
 	}
@@ -333,10 +350,12 @@ void Game::Update(float deltaTime, float totalTime)
 		projQueue.front()->SetOwner(false);
 		projectiles.push_back(projQueue.front());
 		projQueue.pop();
+
 	}
 	fired2 = GetAsyncKeyState('N');
 
 	//update projectiles
+	
 	for (int i = 0; i < projectiles.size(); i++)
 	{
 		//checks to see if projectile is active before running logic (temporary work around)
@@ -353,6 +372,7 @@ void Game::Update(float deltaTime, float totalTime)
 					projectiles[i]->SetActive(false);
 					PrintHealth();
 					projQueue.push(projectiles[i]);
+					projectiles.erase(projectiles.begin() + i);
 				}
 			}
 			
@@ -369,9 +389,7 @@ void Game::Update(float deltaTime, float totalTime)
 			}
 		}
 	}
-
-
-
+	
 }
 
 // --------------------------------------------------------

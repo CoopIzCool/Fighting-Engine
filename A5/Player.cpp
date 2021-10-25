@@ -161,34 +161,3 @@ int Player::GetHealth()
 	return hitpoints;
 }
 
-//method is used by mesh, not needed, will be deleted later
-void Player::SetBounds(Vertex* verts)
-{
-	for (int i = 0; i < 4; i++)
-	{
-		if (verts[i].Position.x > maxBounds.x)
-		{
-			maxBounds.x = verts[i].Position.x;
-		}
-		else if (verts[i].Position.x < minBounds.x)
-		{
-			minBounds.x = verts[i].Position.x;
-		}
-		if (verts[i].Position.y > maxBounds.y)
-		{
-			maxBounds.y = verts[i].Position.y;
-		}
-		else if (verts[i].Position.y < minBounds.y)
-		{
-			minBounds.y = verts[i].Position.y;
-		}
-		if (verts[i].Position.z > maxBounds.z)
-		{
-			maxBounds.z = verts[i].Position.z;
-		}
-		else if (verts[i].Position.z < minBounds.z)
-		{
-			minBounds.z = verts[i].Position.z;
-		}
-	}
-}
