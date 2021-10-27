@@ -29,6 +29,13 @@ DirectX::XMFLOAT3 Hitbox::Launch()
 	return launchVector;
 }
 
+DirectX::XMFLOAT3 Hitbox::P2Launch()
+{
+	//inverts the x component of the launch vector
+	float invertedX = launchVector.x * -1.0f;
+	return DirectX::XMFLOAT3(invertedX,launchVector.y,launchVector.z);
+}
+
 int Hitbox::Start()
 {
 	return startFrames;

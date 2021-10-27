@@ -54,8 +54,6 @@ private:
 	Mesh* mesh1;
 	Mesh* mesh2;
 	Mesh* groundMesh;
-	Mesh* projMesh;
-
 	
 	//shaders
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constBufferVS;
@@ -64,29 +62,44 @@ private:
 	Entity* entity1;
 	Entity* entity2;
 	Entity* groundEntity;
-	Entity* projEntity;
 	
 	//players
 	Player* p1;
 	Player* p2;
 	Player* players[2];
 	
-
+	//camera
 	Camera* camera;
-	//projectiles
-	std::vector<Projectile*> projectiles;
-	std::queue<Projectile*> projQueue;
-	
+
+	//materials
 	Material* m1;
 	Material* m2;
 	Material* groundMat;
+	Material* transparentMat;
 
 	//player fired projectile states
 	bool fired1 = false;
 	bool fired2 = false;
 
-	//hitbox storages
+	//hitbox storages for mesh/entity
 	Mesh* projMeshes[10];
 	Entity* projEntities[10];
+
+	Mesh* jabMeshes[5];
+	Entity* jabEntities[5];
+	//projectiles
+	std::vector<Projectile*> projectiles;
+	std::queue<Projectile*> projQueue;
+
+	//player attack states
+	bool p1Starting = false;
+	bool p2Starting = false;
+	bool p1Active = false;
+	bool p2Active = false;
+	bool p1End = false;
+	bool p2End = false;
+
+	int p1Frames;
+	int p2Frames;
 };
 

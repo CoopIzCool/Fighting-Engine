@@ -1,11 +1,6 @@
 #include "Player.h"
 #include <iostream>
 
-
-Player::Player(Entity* et, bool p2)
-{
-}
-
 Player::Player(Entity* et, int hitP, bool p2)
 {
 	entity = et;
@@ -159,5 +154,10 @@ Entity* Player::GetEntity()
 int Player::GetHealth()
 {
 	return hitpoints;
+}
+
+bool Player::isGrounded()
+{
+	return (!freeFall & !jumpPressed);
 }
 

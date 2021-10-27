@@ -52,19 +52,18 @@ Game::~Game()
 	delete(mesh1);
 	delete(mesh2);
 	delete(groundMesh);
-	delete(projMesh);
 
 	delete(p1);
 	delete(entity1);
 	delete(p2);
 	delete(entity2);
 	delete(groundEntity);
-	delete(projEntity);
 	delete(camera);
 
 	delete(m1);
 	delete(m2);
 	delete(groundMat);
+	delete(transparentMat);
 	
 	for (int i = 0; i < 10; i++)
 	{
@@ -264,17 +263,17 @@ void Game::CreateBasicGeometry()
 	mesh1 = new Mesh(vertices1, 4, indices, 6, device);
 	mesh2 = new Mesh(vertices2, 4, indices, 6, device);
 	groundMesh = new Mesh(groundVerts, 4, indices, 6, device);
-	projMesh = new Mesh(projVerts, 4, indices, 6, device);
 
 	m1 = new Material({ 0.3f,0.8f,0.6f,1.0f }, pixelShader, vertexShader);
 	m2 = new Material({ 0.9f,0.2f,0.2f,1.0f }, pixelShader, vertexShader);
 	groundMat = new Material({ 1.0f,1.0f,1.0f,1.0f }, pixelShader, vertexShader);
+	transparentMat = new Material({ 1.0f,1.0f,1.0f,0.0f }, pixelShader, vertexShader);
 
 	entity1 = new Entity(mesh1,m1);
 	entity2 = new Entity(mesh2,m2);
 	groundEntity = new Entity(groundMesh, groundMat);
 
-	projEntity = new Entity(projMesh, groundMat);
+	//projectile loading and queue loading
 	for (int i = 0; i < 10; i++)
 	{
 		Vertex vertsProj[] =
@@ -327,47 +326,41 @@ void Game::Update(float deltaTime, float totalTime)
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
-	p1->Update(deltaTime);
-	p2->Update(deltaTime);
-	
-	//projectile firing for 1
-	if (GetAsyncKeyState('C') & 0x8000 && !fired1)
+	//game logic for p1
+	if (!p1Starting & !p1Active & !p1End)
 	{
-		/*
-		Projectile* proj = new Projectile(projEntity, 10, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x,
-			p1->GetEntity()->GetTransform()->getPosition().y, true);
-		projectiles.push_back(proj);
-		fired1 = true;
-		*/
-		projQueue.front()->Shot(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x,
-			p1->GetEntity()->GetTransform()->getPosition().y);
-		projQueue.front()->SetOwner(true);
-		projectiles.push_back(projQueue.front());
-		projQueue.pop();
+		p1->Update(deltaTime);
+		//projectile firing for 1
+		if (GetAsyncKeyState('C') & 0x8000 && !fired1)
+		{
+			projQueue.front()->Shot(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x,
+				p1->GetEntity()->GetTransform()->getPosition().y);
+			projQueue.front()->SetOwner(true);
+			projectiles.push_back(projQueue.front());
+			projQueue.pop();
 
+		}
+		fired1 = GetAsyncKeyState('C');
 	}
-	fired1 = GetAsyncKeyState('C');
 
-	//projectile firing for 2
-	if (GetAsyncKeyState('N') & 0x8000 && !fired2)
+	//game logic for p2
+	if (!p2Starting & !p2Active & !p2End)
 	{
-		/*
-		Projectile* proj = new Projectile(projEntity, 10, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x,
-			p2->GetEntity()->GetTransform()->getPosition().y, false);
-		projectiles.push_back(proj);
-		fired2= true;
-		*/
-		projQueue.front()->Shot(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x,
-			p2->GetEntity()->GetTransform()->getPosition().y);
-		projQueue.front()->SetOwner(false);
-		projectiles.push_back(projQueue.front());
-		projQueue.pop();
+		p2->Update(deltaTime);
+		//projectile firing for 2
+		if (GetAsyncKeyState('N') & 0x8000 && !fired2)
+		{
+			projQueue.front()->Shot(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x,
+				p2->GetEntity()->GetTransform()->getPosition().y);
+			projQueue.front()->SetOwner(false);
+			projectiles.push_back(projQueue.front());
+			projQueue.pop();
 
+		}
+		fired2 = GetAsyncKeyState('N');
 	}
-	fired2 = GetAsyncKeyState('N');
 
 	//update projectiles
-	
 	for (int i = 0; i < projectiles.size(); i++)
 	{
 		//checks to see if projectile is active before running logic (temporary work around)

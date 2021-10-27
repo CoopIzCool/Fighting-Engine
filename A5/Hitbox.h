@@ -8,6 +8,7 @@ public:
 	Entity* GetEntity();
 	int Damage();
 	DirectX::XMFLOAT3 Launch();
+	DirectX::XMFLOAT3 P2Launch();
 	int Start(); 
 	int Active();
 	int End();
