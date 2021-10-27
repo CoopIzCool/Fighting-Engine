@@ -66,11 +66,13 @@ Game::~Game()
 	delete(m2);
 	delete(groundMat);
 	
-	
-	for(int i = 0;i  < projectiles.size() ; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		//delete(projectiles[i]->GetEntity()->GetMesh());
-		//delete(projectiles[i]->GetEntity());
+		delete(projEntities[i]);
+		delete(projMeshes[i]);
+	}
+	for(int i = 0; i < projectiles.size() ; i++)
+	{
 		delete(projectiles[i]);
 	}
 	
@@ -273,7 +275,6 @@ void Game::CreateBasicGeometry()
 	groundEntity = new Entity(groundMesh, groundMat);
 
 	projEntity = new Entity(projMesh, groundMat);
-
 	for (int i = 0; i < 10; i++)
 	{
 		Vertex vertsProj[] =
@@ -284,9 +285,18 @@ void Game::CreateBasicGeometry()
 		{ XMFLOAT3(-0.05f, -0.05f, +0.0f), blue },
 
 		};
-		Mesh* meshproj = new Mesh(vertsProj, 4, indices, 6, device);
-		Entity* etProj = new Entity(projMesh, groundMat);
-		Projectile* proj = new Projectile(projEntity, 10);
+		Mesh* pMesh = new Mesh(vertsProj, 4, indices, 6, device);
+		projMeshes[i] = pMesh;
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		Entity* pEntity = new Entity(projMeshes[i], groundMat);
+		projEntities[i] = pEntity;
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		Projectile* proj = new Projectile(projEntities[i], 10);
 		projQueue.push(proj);
 	}
 	p1 = new Player(entity1, 100, false);

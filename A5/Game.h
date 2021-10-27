@@ -86,5 +86,7 @@ private:
 	bool fired2 = false;
 
 	//hitbox storages
+	Mesh* projMeshes[10];
+	Entity* projEntities[10];
 };
 
