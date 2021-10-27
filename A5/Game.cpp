@@ -249,12 +249,13 @@ void Game::CreateBasicGeometry()
 
 	};
 
-	Vertex projVerts[] = 
+	
+	Vertex jabVerts[] = 
 	{
-	{ XMFLOAT3(-0.05f, +0.05f, +0.0f), red },
-	{ XMFLOAT3(+0.05f, +0.05f, +0.0f), red },
-	{ XMFLOAT3(+0.05f, -0.05f, +0.0f), red },
-	{ XMFLOAT3(-0.05f, -0.05f, +0.0f), blue },
+	{ XMFLOAT3(-0.07f, +0.06f, +0.0f), blue },
+	{ XMFLOAT3(+0.07f, +0.06f, +0.0f), blue },
+	{ XMFLOAT3(+0.07f, -0.06f, +0.0f), blue },
+	{ XMFLOAT3(-0.07f, -0.06f, +0.0f), blue },
 
 	};
 
@@ -341,6 +342,36 @@ void Game::Update(float deltaTime, float totalTime)
 
 		}
 		fired1 = GetAsyncKeyState('C');
+	}
+	else if (p1Starting)
+	{
+		p1Frames++;
+		if (p1Frames >= p1->GetStart())
+		{
+			p1Frames = 0;
+			p1Starting = false;
+			p1Active = true;
+		}
+	}
+	else if (p1Active)
+	{
+		p1Frames++;
+		if (p1Frames >= p1->GetActive())
+		{
+			p1Frames = 0;
+			p1Active = false;
+			p1Active = true;
+		}
+	}
+	else if (p1End)
+	{
+		p1Frames++;
+		if (p1Frames >= p1->GetEnd())
+		{
+			p1Frames = 0;
+			p1End = false;
+			p1->ResetFrames();
+		}
 	}
 
 	//game logic for p2

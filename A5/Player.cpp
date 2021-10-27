@@ -69,7 +69,7 @@ void Player::Update(float dt)
 				freeFall = true;
 				jumpFrames = 0;
 			}
-			if (!freeFall && jumpFrames >= 10 )
+			if (!freeFall && jumpFrames >= 10)
 			{
 				freeFall = true;
 				jumpFrames = 0;
@@ -159,5 +159,35 @@ int Player::GetHealth()
 bool Player::isGrounded()
 {
 	return (!freeFall & !jumpPressed);
+}
+
+int Player::GetStart()
+{
+	return frames[0];
+}
+
+int Player::GetActive()
+{
+	return frames[1];
+}
+
+int Player::GetEnd()
+{
+	return frames[2];
+}
+
+void Player::SetFrames(Hitbox* hb)
+{
+	frames[0] = hb->Start();
+	frames[1] = hb->Active();
+	frames[2] = hb->End();
+	ActiveHitbox = hb;
+}
+
+void Player::ResetFrames()
+{
+	frames[0] = 0;
+	frames[1] = 0;
+	frames[2] = 0;
 }
 

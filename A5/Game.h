@@ -77,16 +77,22 @@ private:
 	Material* groundMat;
 	Material* transparentMat;
 
-	//player fired projectile states
+	//player attack states
 	bool fired1 = false;
 	bool fired2 = false;
+	bool attacked1 = false;
+	bool attacked2 = false;
 
 	//hitbox storages for mesh/entity
+	
+	//projectiles
 	Mesh* projMeshes[10];
 	Entity* projEntities[10];
 
+	//jabs
 	Mesh* jabMeshes[5];
 	Entity* jabEntities[5];
+
 	//projectiles
 	std::vector<Projectile*> projectiles;
 	std::queue<Projectile*> projQueue;
@@ -98,6 +104,7 @@ private:
 	bool p2Active = false;
 	bool p1End = false;
 	bool p2End = false;
+
 
 	int p1Frames;
 	int p2Frames;
