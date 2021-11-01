@@ -97,6 +97,9 @@ private:
 	std::vector<Projectile*> projectiles;
 	std::queue<Projectile*> projQueue;
 
+	//jabs
+	std::queue<Hitbox*> jabQueue;
+
 	//player attack states
 	bool p1Starting = false;
 	bool p2Starting = false;

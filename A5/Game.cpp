@@ -75,17 +75,30 @@ Game::~Game()
 	{
 		delete(projectiles[i]);
 	}
-	
-	for (int i = 0;i < projQueue.size(); i++)
+
+	int projQueueSize = projQueue.size();
+	for (int i = 0;i < projQueueSize; i++)
 	{
-		//delete(projQueue.front());
 		Projectile* proj = projQueue.front();
 		delete(proj);
 		projQueue.pop();
-		
-
 	}
 	
+
+	for (int i = 0; i < 5; i++)
+	{
+		delete(jabMeshes[i]);
+		delete(jabEntities[i]);
+
+	}
+
+	int jabQueueSize = jabQueue.size();
+	for (int i = 0;i < jabQueueSize; i++)
+	{
+		Hitbox* hb = jabQueue.front();
+		delete(hb);
+		jabQueue.pop();
+	}
 }
 
 // --------------------------------------------------------
@@ -253,15 +266,7 @@ void Game::CreateBasicGeometry()
 
 	};
 
-	
-	Vertex jabVerts[] = 
-	{
-	{ XMFLOAT3(-0.07f, +0.06f, +0.0f), blue },
-	{ XMFLOAT3(+0.07f, +0.06f, +0.0f), blue },
-	{ XMFLOAT3(+0.07f, -0.06f, +0.0f), blue },
-	{ XMFLOAT3(-0.07f, -0.06f, +0.0f), blue },
 
-	};
 
 	unsigned int indices[] = { 0,1,2,0,2,3 };
 
@@ -278,6 +283,7 @@ void Game::CreateBasicGeometry()
 	entity2 = new Entity(mesh2,m2);
 	groundEntity = new Entity(groundMesh, groundMat);
 
+#pragma region HitBox Loading
 	//projectile loading and queue loading
 	for (int i = 0; i < 10; i++)
 	{
@@ -303,6 +309,35 @@ void Game::CreateBasicGeometry()
 		Projectile* proj = new Projectile(projEntities[i], 10);
 		projQueue.push(proj);
 	}
+
+	//jab loading and queue loading
+	for (int i = 0; i < 5; i++)
+	{
+
+		Vertex jabVerts[] =
+		{
+		{ XMFLOAT3(-0.07f, +0.06f, +0.0f), blue },
+		{ XMFLOAT3(+0.07f, +0.06f, +0.0f), blue },
+		{ XMFLOAT3(+0.07f, -0.06f, +0.0f), blue },
+		{ XMFLOAT3(-0.07f, -0.06f, +0.0f), blue },
+		};
+		Mesh* jMesh = new Mesh(jabVerts, 4, indices, 6, device);
+		jabMeshes[i] = jMesh;
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		Entity* jEntity = new Entity(jabMeshes[i], groundMat);
+		jabEntities[i] = jEntity;
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		Hitbox* hb = new Hitbox(jabEntities[i],10,XMFLOAT3(5.0f,7.5f,0.0f),4.0f,45.0f,8.0f);
+		jabQueue.push(hb);
+	}
+#pragma endregion
+
+	
 	p1 = new Player(entity1, 100, false);
 	p2 = new Player(entity2, 100, true);
 	players[0] = p1;
@@ -346,6 +381,16 @@ void Game::Update(float deltaTime, float totalTime)
 
 		}
 		fired1 = GetAsyncKeyState('C');
+		if (GetAsyncKeyState('X') & 0x8000 && !attacked1)
+		{
+			projQueue.front()->Shot(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x,
+				p1->GetEntity()->GetTransform()->getPosition().y);
+			projQueue.front()->SetOwner(true);
+			projectiles.push_back(projQueue.front());
+			projQueue.pop();
+
+		}
+		attacked1 = GetAsyncKeyState('X');
 	}
 	else if (p1Starting)
 	{
