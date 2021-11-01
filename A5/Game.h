@@ -109,6 +109,7 @@ private:
 	float p1Frames;
 	float p2Frames;
 
-	
+	Microsoft::WRL::ComPtr<ID3D10Texture2D> texture;
+	//h ttps://docs.microsoft.com/en-us/windows/win32/direct3d10/d3d10-graphics-programming-guide-resources-creating-textures#create-a-texture-from-a-file
 };
 
