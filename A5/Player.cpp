@@ -30,7 +30,8 @@ void Player::Update(float dt)
 				{
 					jumpPressed = true;
 				}
-				jumpFrames++;
+				jumpFrames+= (dt * 60.0f);
+				std::cout << jumpFrames<< std::endl;
 				
 			}
 			else if (tf.getPosition().y > 0)
@@ -41,7 +42,7 @@ void Player::Update(float dt)
 			{
 				entity->GetTransform()->setPosition(tf.getPosition().x, 0, tf.getPosition().z);
 				freeFall = false;
-				jumpFrames = 0;
+				jumpFrames = 0.0f;
 				jumpPressed = false;
 			}
 
@@ -67,12 +68,12 @@ void Player::Update(float dt)
 			if (!freeFall && !GetAsyncKeyState('W') && jumpPressed)
 			{
 				freeFall = true;
-				jumpFrames = 0;
+				jumpFrames = 0.0f;
 			}
-			if (!freeFall && jumpFrames >= 10)
+			if (!freeFall && jumpFrames >= 10.0f)
 			{
 				freeFall = true;
-				jumpFrames = 0;
+				jumpFrames = 0.0f;
 			}
 
 
@@ -83,11 +84,11 @@ void Player::Update(float dt)
 			if (GetAsyncKeyState('I') & 0x8000 && (!freeFall))
 			{
 				entity->GetTransform()->MoveRelative(0, speed, 0);
-				if (jumpFrames == 0)
+				if (jumpFrames == 0.0f)
 				{
 					jumpPressed = true;
 				}
-				jumpFrames++;
+				jumpFrames += (dt * 60.0f);
 			}
 			else if (tf.getPosition().y > 0)
 			{
@@ -97,7 +98,7 @@ void Player::Update(float dt)
 			{
 				entity->GetTransform()->setPosition(tf.getPosition().x, 0, tf.getPosition().z);
 				freeFall = false;
-				jumpFrames = 0;
+				jumpFrames = 0.0f;
 				jumpPressed = false;
 			}
 
@@ -122,12 +123,12 @@ void Player::Update(float dt)
 			if (!freeFall && !GetAsyncKeyState('I') && jumpPressed)
 			{
 				freeFall = true;
-				jumpFrames = 0;
+				jumpFrames = 0.0f;
 			}
-			if (!freeFall && jumpFrames >= 10)
+			if (!freeFall && jumpFrames >= 10.0f)
 			{
 				freeFall = true;
-				jumpFrames = 0;
+				jumpFrames = 0.0f;
 			}
 		}
 	}
@@ -161,17 +162,17 @@ bool Player::isGrounded()
 	return (!freeFall & !jumpPressed);
 }
 
-int Player::GetStart()
+float Player::GetStart()
 {
 	return frames[0];
 }
 
-int Player::GetActive()
+float Player::GetActive()
 {
 	return frames[1];
 }
 
-int Player::GetEnd()
+float Player::GetEnd()
 {
 	return frames[2];
 }

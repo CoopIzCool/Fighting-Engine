@@ -1,6 +1,6 @@
 #include "Hitbox.h"
 
-Hitbox::Hitbox(Entity* et, int dam, DirectX::XMFLOAT3 launch, int start, int active, int end)
+Hitbox::Hitbox(Entity* et, int dam, DirectX::XMFLOAT3 launch, float start, float active, float end)
 {
 	entity = et;
 	damage = dam;
@@ -36,17 +36,17 @@ DirectX::XMFLOAT3 Hitbox::P2Launch()
 	return DirectX::XMFLOAT3(invertedX,launchVector.y,launchVector.z);
 }
 
-int Hitbox::Start()
+float Hitbox::Start()
 {
 	return startFrames;
 }
 
-int Hitbox::Active()
+float Hitbox::Active()
 {
 	return activeFrames;
 }
 
-int Hitbox::End()
+float Hitbox::End()
 {
 	return endFrames;
 }

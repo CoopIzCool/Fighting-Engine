@@ -15,9 +15,9 @@ public:
 	Entity* GetEntity();
 	int GetHealth();
 	bool isGrounded();
-	int GetStart();
-	int GetActive();
-	int GetEnd();
+	float GetStart();
+	float GetActive();
+	float GetEnd();
 	void SetFrames(Hitbox* hb);
 	void ResetFrames();
 	
@@ -26,10 +26,10 @@ private:
 	int hitpoints = 100;
 	bool isP2;
 	bool alive = true;
-	int jumpFrames = 0;
+	float jumpFrames = 0;
 	bool freeFall = false;
 	bool jumpPressed = false;
-	int frames[3] = { 0,0,0 };
+	float frames[3] = { 0,0,0 };
 	Hitbox* ActiveHitbox = nullptr;
 };
 

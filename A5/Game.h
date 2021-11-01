@@ -106,7 +106,9 @@ private:
 	bool p2End = false;
 
 
-	int p1Frames;
-	int p2Frames;
+	float p1Frames;
+	float p2Frames;
+
+	
 };
 

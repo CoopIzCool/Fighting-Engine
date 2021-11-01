@@ -67,8 +67,9 @@ Game::~Game()
 	
 	for (int i = 0; i < 10; i++)
 	{
-		delete(projEntities[i]);
 		delete(projMeshes[i]);
+		delete(projEntities[i]);
+		
 	}
 	for(int i = 0; i < projectiles.size() ; i++)
 	{
@@ -78,7 +79,10 @@ Game::~Game()
 	for (int i = 0;i < projQueue.size(); i++)
 	{
 		//delete(projQueue.front());
+		Projectile* proj = projQueue.front();
+		delete(proj);
 		projQueue.pop();
+		
 
 	}
 	
@@ -345,7 +349,7 @@ void Game::Update(float deltaTime, float totalTime)
 	}
 	else if (p1Starting)
 	{
-		p1Frames++;
+		p1Frames+= (deltaTime* 60.0f);
 		if (p1Frames >= p1->GetStart())
 		{
 			p1Frames = 0;
@@ -355,7 +359,7 @@ void Game::Update(float deltaTime, float totalTime)
 	}
 	else if (p1Active)
 	{
-		p1Frames++;
+		p1Frames+= (deltaTime * 60.0f);
 		if (p1Frames >= p1->GetActive())
 		{
 			p1Frames = 0;
@@ -365,7 +369,7 @@ void Game::Update(float deltaTime, float totalTime)
 	}
 	else if (p1End)
 	{
-		p1Frames++;
+		p1Frames+= (deltaTime * 60.0f);
 		if (p1Frames >= p1->GetEnd())
 		{
 			p1Frames = 0;
@@ -389,6 +393,36 @@ void Game::Update(float deltaTime, float totalTime)
 
 		}
 		fired2 = GetAsyncKeyState('N');
+	}
+	else if (p2Starting)
+	{
+		p2Frames += (deltaTime * 60.0f);
+		if (p2Frames >= p2->GetStart())
+		{
+			p2Frames = 0;
+			p2Starting = false;
+			p2Active = true;
+		}
+	}
+	else if (p2Active)
+	{
+		p2Frames += (deltaTime * 60.0f);
+		if (p2Frames >= p2->GetActive())
+		{
+			p2Frames = 0;
+			p2Active = false;
+			p2Active = true;
+		}
+	}
+	else if (p2End)
+	{
+		p2Frames += (deltaTime * 60.0f);
+		if (p2Frames >= p2->GetEnd())
+		{
+			p2Frames = 0;
+			p2End = false;
+			p2->ResetFrames();
+		}
 	}
 
 	//update projectiles
