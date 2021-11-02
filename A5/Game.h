@@ -30,6 +30,7 @@ public:
 	void Update(float deltaTime, float totalTime);
 	void Draw(float deltaTime, float totalTime);
 	void PrintHealth();
+	void PlayerHit(bool isP1);
 
 private:
 
@@ -107,6 +108,8 @@ private:
 	bool p2Active = false;
 	bool p1End = false;
 	bool p2End = false;
+	bool p1Hit = false;
+	bool p2Hit = false;
 
 
 	float p1Frames;

@@ -20,6 +20,9 @@ public:
 	float GetEnd();
 	void SetFrames(Hitbox* hb);
 	void ResetFrames();
+	bool HasHitBox();
+	Hitbox* UsedHitbox();
+	void LaunchPlayer(DirectX::XMFLOAT3 angle);
 	
 private:
 	Entity* entity;
@@ -31,5 +34,7 @@ private:
 	bool jumpPressed = false;
 	float frames[3] = { 0,0,0 };
 	Hitbox* ActiveHitbox = nullptr;
+	bool hasHitbox = false;
+	bool allowMovement = true;
 };
 

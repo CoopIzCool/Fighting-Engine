@@ -242,18 +242,18 @@ void Game::CreateBasicGeometry()
 	*/
 	Vertex vertices1[] =
 	{
-		{ XMFLOAT3(-0.25f, +0.3f, +0.0f), red },
-		{ XMFLOAT3(+0.05f, +0.3f, +0.0f), green },
-		{ XMFLOAT3(+0.05f, -0.15f, +0.0f), blue },
-		{ XMFLOAT3(-0.25f, -0.15f, +0.0f), green },
+		{ XMFLOAT3(-0.15f, +0.3f, +0.0f), red },
+		{ XMFLOAT3(+0.15f, +0.3f, +0.0f), green },
+		{ XMFLOAT3(+0.15f, -0.15f, +0.0f), blue },
+		{ XMFLOAT3(-0.15f, -0.15f, +0.0f), green },
 
 	};
 	Vertex vertices2[] =
 	{
-		{ XMFLOAT3(+0.05f, +0.3f, +0.0f), green },
-		{ XMFLOAT3(+0.35f, +0.3f, +0.0f), blue },
-		{ XMFLOAT3(+0.35f, -0.15f, +0.0f), red },
-		{ XMFLOAT3(+0.05f, -0.15f, +0.0f), blue },
+		{ XMFLOAT3(-0.15f, +0.3f, +0.0f), green },
+		{ XMFLOAT3(+0.15f, +0.3f, +0.0f), blue },
+		{ XMFLOAT3(+0.15f, -0.15f, +0.0f), red },
+		{ XMFLOAT3(-0.15f, -0.15f, +0.0f), blue },
 
 	};
 	
@@ -317,8 +317,8 @@ void Game::CreateBasicGeometry()
 		Vertex jabVerts[] =
 		{
 		{ XMFLOAT3(-0.07f, +0.06f, +0.0f), blue },
-		{ XMFLOAT3(+0.07f, +0.06f, +0.0f), blue },
-		{ XMFLOAT3(+0.07f, -0.06f, +0.0f), blue },
+		{ XMFLOAT3(+0.07f, +0.06f, +0.0f), green },
+		{ XMFLOAT3(+0.07f, -0.06f, +0.0f), green },
 		{ XMFLOAT3(-0.07f, -0.06f, +0.0f), blue },
 		};
 		Mesh* jMesh = new Mesh(jabVerts, 4, indices, 6, device);
@@ -332,14 +332,16 @@ void Game::CreateBasicGeometry()
 
 	for (int i = 0; i < 5; i++)
 	{
-		Hitbox* hb = new Hitbox(jabEntities[i],10,XMFLOAT3(5.0f,7.5f,0.0f),4.0f,45.0f,8.0f);
+		Hitbox* hb = new Hitbox(jabEntities[i],10,XMFLOAT3(0.20f,0.30f,0.0f),4.0f,12.0f,8.0f);
 		jabQueue.push(hb);
 	}
 #pragma endregion
 
 	
 	p1 = new Player(entity1, 100, false);
+	p1->GetEntity()->GetTransform()->setPosition(-0.5f, 0.0f, 0.0f);
 	p2 = new Player(entity2, 100, true);
+	p2->GetEntity()->GetTransform()->setPosition(0.5f, 0.0f, 0.0f);
 	players[0] = p1;
 	players[1] = p2;
 
@@ -366,10 +368,11 @@ void Game::Update(float deltaTime, float totalTime)
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
+	p1->Update(deltaTime);
 	//game logic for p1
-	if (!p1Starting & !p1Active & !p1End)
+	if (!p1Starting && !p1Active && !p1End)
 	{
-		p1->Update(deltaTime);
+		
 		//projectile firing for 1
 		if (GetAsyncKeyState('C') & 0x8000 && !fired1)
 		{
@@ -380,16 +383,13 @@ void Game::Update(float deltaTime, float totalTime)
 			projQueue.pop();
 
 		}
-		fired1 = GetAsyncKeyState('C');
-		if (GetAsyncKeyState('X') & 0x8000 && !attacked1)
+		else if(GetAsyncKeyState('X') & 0x8000 && !attacked1 && p1->isGrounded())
 		{
-			projQueue.front()->Shot(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x,
-				p1->GetEntity()->GetTransform()->getPosition().y);
-			projQueue.front()->SetOwner(true);
-			projectiles.push_back(projQueue.front());
-			projQueue.pop();
-
+			p1->SetFrames(jabQueue.front());
+			p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
+			p1Starting = true;
 		}
+		fired1 = GetAsyncKeyState('C');
 		attacked1 = GetAsyncKeyState('X');
 	}
 	else if (p1Starting)
@@ -405,11 +405,18 @@ void Game::Update(float deltaTime, float totalTime)
 	else if (p1Active)
 	{
 		p1Frames+= (deltaTime * 60.0f);
+		if (!p2Hit && p1->UsedHitbox()->isColliding(p2->GetEntity()))
+		{
+			p2->Damage(p1->UsedHitbox()->GetDamage());
+			p1Hit = true;
+			PrintHealth();
+			PlayerHit(true);
+		}
 		if (p1Frames >= p1->GetActive())
 		{
 			p1Frames = 0;
 			p1Active = false;
-			p1Active = true;
+			p1End = true;
 		}
 	}
 	else if (p1End)
@@ -419,14 +426,20 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			p1Frames = 0;
 			p1End = false;
+			p1Hit = false;
 			p1->ResetFrames();
+			Hitbox* hb = jabQueue.front();
+			jabQueue.pop();
+			jabQueue.push(hb);
+			hb = nullptr;
 		}
 	}
 
 	//game logic for p2
-	if (!p2Starting & !p2Active & !p2End)
+	p2->Update(deltaTime);
+	if (!p2Starting && !p2Active && !p2End)
 	{
-		p2->Update(deltaTime);
+		
 		//projectile firing for 2
 		if (GetAsyncKeyState('N') & 0x8000 && !fired2)
 		{
@@ -437,7 +450,14 @@ void Game::Update(float deltaTime, float totalTime)
 			projQueue.pop();
 
 		}
+		else if(GetAsyncKeyState('M') & 0x8000 && !attacked2 && p2->isGrounded())
+		{
+			p2->SetFrames(jabQueue.front());
+			p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
+			p2Starting = true;
+		}
 		fired2 = GetAsyncKeyState('N');
+		attacked2 = GetAsyncKeyState('M');
 	}
 	else if (p2Starting)
 	{
@@ -452,11 +472,19 @@ void Game::Update(float deltaTime, float totalTime)
 	else if (p2Active)
 	{
 		p2Frames += (deltaTime * 60.0f);
+		if (!p2Hit && p2->UsedHitbox()->isColliding(p1->GetEntity()))
+		{
+			p1->Damage(p2->UsedHitbox()->GetDamage());
+			p2Hit = true;
+			PrintHealth();
+			PlayerHit(false);
+		}
 		if (p2Frames >= p2->GetActive())
 		{
 			p2Frames = 0;
 			p2Active = false;
-			p2Active = true;
+			p2End = true;
+			
 		}
 	}
 	else if (p2End)
@@ -466,7 +494,12 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			p2Frames = 0;
 			p2End = false;
+			p2Hit = false;
 			p2->ResetFrames();
+			Hitbox* hb = jabQueue.front();
+			jabQueue.pop();
+			jabQueue.push(hb);
+			hb = nullptr;
 		}
 	}
 
@@ -505,6 +538,7 @@ void Game::Update(float deltaTime, float totalTime)
 			}
 		}
 	}
+
 	
 }
 
@@ -529,6 +563,7 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	VertexShaderExternalData vsData;
 
+#pragma region Ground Render
 	//Render the ground
 	vsData.view = camera->GetViewMatrix();
 	vsData.projection = camera->GetProjectionMatrix();
@@ -559,6 +594,9 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->IASetIndexBuffer(groundEntity->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
 	context->DrawIndexed(groundEntity->GetMesh()->getIndecesies(), 0, 0);
 
+#pragma endregion
+
+	
 	//draw players
 	for (int i = 0; i < 2; i++)
 	{
@@ -577,8 +615,6 @@ void Game::Draw(float deltaTime, float totalTime)
 		context->Unmap(constBufferVS.Get(), 0);
 
 		context->VSSetConstantBuffers(0, 1, constBufferVS.GetAddressOf());
-
-
 
 		// Set the vertex and pixel shaders to use for the next Draw() command
 		//  - These don't technically need to be set every frame
@@ -609,6 +645,56 @@ void Game::Draw(float deltaTime, float totalTime)
 		context->IASetVertexBuffers(0, 1, players[i]->GetEntity()->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
 		context->IASetIndexBuffer(players[i]->GetEntity()->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
 		context->DrawIndexed(players[i]->GetEntity()->GetMesh()->getIndecesies(), 0, 0);
+		
+		if (players[i]->HasHitBox())
+		{
+			if((i == 0 && p1Active) || (i == 1 && p2Active))
+			vsData.view = camera->GetViewMatrix();
+			vsData.projection = camera->GetProjectionMatrix();
+
+			//shader decleration
+			vsData.colorTint = players[i]->UsedHitbox()->GetEntity()->GetMaterial()->GetColorTint();
+			vsData.world = players[i]->UsedHitbox()->GetEntity()->GetTransform()->GetWorldMatrix();
+
+			D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
+			context->Map(constBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+
+			memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
+
+			context->Unmap(constBufferVS.Get(), 0);
+
+			context->VSSetConstantBuffers(0, 1, constBufferVS.GetAddressOf());
+
+			// Set the vertex and pixel shaders to use for the next Draw() command
+			//  - These don't technically need to be set every frame
+			//  - Once you start applying different shaders to different objects,
+			//    you'll need to swap the current shaders before each draw
+			context->VSSetShader(players[i]->UsedHitbox()->GetEntity()->GetMaterial()->GetVertexShader().Get(), 0, 0);
+			context->PSSetShader(players[i]->UsedHitbox()->GetEntity()->GetMaterial()->GetPixelShader().Get(), 0, 0);
+
+
+			// Ensure the pipeline knows how to interpret the data (numbers)
+			// from the vertex buffer.  
+			// - If all of your 3D models use the exact same vertex layout,
+			//    this could simply be done once in Init()
+			// - However, this isn't always the case (but might be for this course)
+			context->IASetInputLayout(inputLayout.Get());
+
+
+			// Set buffers in the input assembler
+			//  - Do this ONCE PER OBJECT you're drawing, since each object might
+			//    have different geometry.
+			//  - for this demo, this step *could* simply be done once during Init(),
+			//    but I'm doing it here because it's often done multiple times per frame
+			//    in a larger application/game
+			UINT stride = sizeof(Vertex);
+			UINT offset = 0;
+
+
+			context->IASetVertexBuffers(0, 1, players[i]->UsedHitbox()->GetEntity()->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+			context->IASetIndexBuffer(players[i]->UsedHitbox()->GetEntity()->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+			context->DrawIndexed(players[i]->UsedHitbox()->GetEntity()->GetMesh()->getIndecesies(), 0, 0);
+		}
 	}
 	for (int i = 0; i < projectiles.size(); i++)
 	{
@@ -664,10 +750,6 @@ void Game::Draw(float deltaTime, float totalTime)
 			context->IASetIndexBuffer(projectiles[i]->GetEntity()->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
 			context->DrawIndexed(projectiles[i]->GetEntity()->GetMesh()->getIndecesies(), 0, 0);
 			
-			if (projectiles.size() > 3)
-			{
-				std::cout << "three";
-			}
 			
 		}
 	}
@@ -687,3 +769,59 @@ void Game::PrintHealth()
 	std::cout << std::flush;
 	std::cout << "Player 1 Health:  " << p1->GetHealth() << "  Player 2 Health:  " << p2->GetHealth()<<std::endl;
 }
+
+
+void Game::PlayerHit(bool isP1)
+{
+	float direction = p1->GetEntity()->GetTransform()->getPosition().x - p2->GetEntity()->GetTransform()->getPosition().x;
+	bool reverse = direction > 0;
+	switch (isP1)
+	{
+		case true: 
+		{
+			p1Active = false;
+			p1Starting = false;
+			p1End = false;
+			p1->ResetFrames();
+			
+			Hitbox* hb = jabQueue.front();
+			if (reverse)
+			{
+				p2->LaunchPlayer(hb->P2Launch());
+			}
+			else
+			{
+				p2->LaunchPlayer(hb->Launch());
+			}
+			
+			jabQueue.pop();
+			jabQueue.push(hb);
+			hb = nullptr;
+			
+		}
+		break;
+		case false:
+		{
+			p2Active = false;
+			p2Starting = false;
+			p2End = false;
+			p2->ResetFrames();
+			Hitbox* hb = jabQueue.front();
+			if (!reverse)
+			{
+				p1->LaunchPlayer(hb->P2Launch());
+			}
+			else
+			{
+				p1->LaunchPlayer(hb->Launch());
+			}
+			jabQueue.pop();
+			jabQueue.push(hb);
+			hb = nullptr;
+		}
+		break;
+	}
+	
+}
+
+
