@@ -106,18 +106,18 @@ void Player::Update(float dt)
 				if (GetAsyncKeyState('J') & 0x8000)
 				{
 					entity->GetTransform()->MoveRelative(-speed, 0, 0);
-					if (entity->GetTransform()->getPosition().x < -1.5f)
+					if (entity->GetTransform()->getPosition().x < -1.2f)
 					{
-						entity->GetTransform()->setPosition(-1.5f, tf.getPosition().y, tf.getPosition().z);
+						entity->GetTransform()->setPosition(-1.2f, tf.getPosition().y, tf.getPosition().z);
 
 					}
 				}
 				if (GetAsyncKeyState('L') & 0x8000)
 				{
 					entity->GetTransform()->MoveRelative(speed, 0, 0);
-					if (entity->GetTransform()->getPosition().x > 1.08f)
+					if (entity->GetTransform()->getPosition().x > 1.35f)
 					{
-						entity->GetTransform()->setPosition(1.08f, tf.getPosition().y, tf.getPosition().z);
+						entity->GetTransform()->setPosition(1.35f, tf.getPosition().y, tf.getPosition().z);
 					}
 				}
 				//jumping logic for p2
