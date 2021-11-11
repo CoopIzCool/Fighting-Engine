@@ -13,6 +13,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <queue>
+#include <string>
 
 
 class Game 
