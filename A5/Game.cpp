@@ -335,6 +335,7 @@ void Game::CreateBasicGeometry()
 		Hitbox* hb = new Hitbox(jabEntities[i],10,XMFLOAT3(0.20f,0.30f,0.0f),4.0f,12.0f,8.0f);
 		jabQueue.push(hb);
 	}
+
 #pragma endregion
 
 	
