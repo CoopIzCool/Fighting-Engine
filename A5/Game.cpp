@@ -99,6 +99,21 @@ Game::~Game()
 		delete(hb);
 		jabQueue.pop();
 	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		delete(dTiltMeshes[i]);
+		delete(dTiltEntities[i]);
+
+	}
+
+	int dTiltQueueSize = dTiltQueue.size();
+	for (int i = 0;i < dTiltQueueSize; i++)
+	{
+		Hitbox* hb = dTiltQueue.front();
+		delete(hb);
+		dTiltQueue.pop();
+	}
 }
 
 // --------------------------------------------------------
@@ -332,8 +347,33 @@ void Game::CreateBasicGeometry()
 
 	for (int i = 0; i < 5; i++)
 	{
-		Hitbox* hb = new Hitbox(jabEntities[i],10,XMFLOAT3(0.20f,0.30f,0.0f),4.0f,12.0f,8.0f);
+		Hitbox* hb = new Hitbox(jabEntities[i],10,XMFLOAT3(0.20f,0.30f,0.0f),4.0f,12.0f,8.0f,hitboxes::jab);
 		jabQueue.push(hb);
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+
+		Vertex dTiltVerts[] =
+		{
+		{ XMFLOAT3(-0.1f, -0.06f, +0.0f), blue },
+		{ XMFLOAT3(+0.1f, -0.06f, +0.0f), green },
+		{ XMFLOAT3(+0.1f, -0.2f, +0.0f), green },
+		{ XMFLOAT3(-0.1f, -0.2f, +0.0f), blue },
+		};
+		Mesh* dMesh = new Mesh(dTiltVerts, 4, indices, 6, device);
+		dTiltMeshes[i] = dMesh;
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		Entity* dEntity = new Entity(dTiltMeshes[i], groundMat);
+		dTiltEntities[i] = dEntity;
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		Hitbox* hb = new Hitbox(dTiltEntities[i], 10, XMFLOAT3(0.20f, 0.30f, 0.0f), 4.0f, 12.0f, 8.0f, hitboxes::dtilt);
+		dTiltQueue.push(hb);
 	}
 
 #pragma endregion
@@ -386,7 +426,14 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 		else if(GetAsyncKeyState('X') & 0x8000 && !attacked1 && p1->isGrounded())
 		{
-			p1->SetFrames(jabQueue.front());
+			if (GetAsyncKeyState('S') & 0x8000)
+			{
+				p1->SetFrames(dTiltQueue.front());
+			}
+			else
+			{
+				p1->SetFrames(jabQueue.front());
+			}
 			p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
 			p1Starting = true;
 		}
@@ -428,11 +475,30 @@ void Game::Update(float deltaTime, float totalTime)
 			p1Frames = 0;
 			p1End = false;
 			p1Hit = false;
-			p1->ResetFrames();
-			Hitbox* hb = jabQueue.front();
-			jabQueue.pop();
-			jabQueue.push(hb);
-			hb = nullptr;
+			
+			switch (p1->UsedHitbox()->Type())
+			{
+			case hitboxes::jab:
+				{
+				p1->ResetFrames();
+				Hitbox* hb = jabQueue.front();
+				jabQueue.pop();
+				jabQueue.push(hb);
+				hb = nullptr;
+				}
+				break;
+
+			case hitboxes::dtilt:
+				{
+				p1->ResetFrames();
+				Hitbox* hb = dTiltQueue.front();
+				dTiltQueue.pop();
+				dTiltQueue.push(hb);
+				hb = nullptr;
+				}
+				break;
+			}
+
 		}
 	}
 
@@ -453,7 +519,14 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 		else if(GetAsyncKeyState('M') & 0x8000 && !attacked2 && p2->isGrounded())
 		{
-			p2->SetFrames(jabQueue.front());
+			if (GetAsyncKeyState('K') & 0x8000)
+			{
+				p1->SetFrames(dTiltQueue.front());
+			}
+			else
+			{
+				p1->SetFrames(jabQueue.front());
+			}
 			p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
 			p2Starting = true;
 		}
@@ -496,11 +569,27 @@ void Game::Update(float deltaTime, float totalTime)
 			p2Frames = 0;
 			p2End = false;
 			p2Hit = false;
-			p2->ResetFrames();
-			Hitbox* hb = jabQueue.front();
-			jabQueue.pop();
-			jabQueue.push(hb);
-			hb = nullptr;
+			switch (p2->UsedHitbox()->Type())
+			{
+			case hitboxes::jab:
+			{
+				p2->ResetFrames();
+				Hitbox* hb = jabQueue.front();
+				jabQueue.pop();
+				jabQueue.push(hb);
+				hb = nullptr;
+			}
+			break;
+			case hitboxes::dtilt:
+			{
+				p2->ResetFrames();
+				Hitbox* hb = dTiltQueue.front();
+				dTiltQueue.pop();
+				dTiltQueue.push(hb);
+				hb = nullptr;
+			}
+			break;
+			}
 		}
 	}
 

@@ -4,6 +4,7 @@
 #include "Material.h"
 #include "Projectile.h"
 #include "Hitbox.h"
+#include "HitBoxType.h"
 #include <string>
 
 class Player
@@ -37,6 +38,6 @@ private:
 	Hitbox* ActiveHitbox = nullptr;
 	bool hasHitbox = false;
 	bool allowMovement = true;
-	std::string HitBoxType;
+	hitboxes type;
 };
 

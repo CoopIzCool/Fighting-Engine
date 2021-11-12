@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <queue>
 #include <string>
+#include "Inputs.h"
+#include "HitBoxType.h"
 
 
 class Game 
@@ -95,13 +97,18 @@ private:
 	Mesh* jabMeshes[5];
 	Entity* jabEntities[5];
 
+	//down tilts
+	Mesh* dTiltMeshes[5];
+	Entity* dTiltEntities[5];
+
 	//projectiles
 	std::vector<Projectile*> projectiles;
 	std::queue<Projectile*> projQueue;
-
+	
 	//jabs
 	std::queue<Hitbox*> jabQueue;
-
+	//down tilts
+	std::queue<Hitbox*> dTiltQueue;
 	//player attack states
 	bool p1Starting = false;
 	bool p2Starting = false;
@@ -117,6 +124,10 @@ private:
 	float p2Frames;
 
 	Microsoft::WRL::ComPtr<ID3D10Texture2D> texture;
+
+	//input logs
+	std::vector<inputs> InputLog1;
+	std::vector<inputs> InputLog2;
 	//h ttps://docs.microsoft.com/en-us/windows/win32/direct3d10/d3d10-graphics-programming-guide-resources-creating-textures#create-a-texture-from-a-file
 };
 

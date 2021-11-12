@@ -2,7 +2,7 @@
 
 
 
-Hitbox::Hitbox(Entity* et, int dam, DirectX::XMFLOAT3 launch, float start, float active, float end)
+Hitbox::Hitbox(Entity* et, int dam, DirectX::XMFLOAT3 launch, float start, float active, float end,hitboxes HBtype)
 {
 	entity = et;
 	damage = dam;
@@ -10,6 +10,7 @@ Hitbox::Hitbox(Entity* et, int dam, DirectX::XMFLOAT3 launch, float start, float
 	startFrames = start;
 	activeFrames = active;
 	endFrames = end;
+	type = HBtype;
 }
 
 Hitbox::~Hitbox()
@@ -109,3 +110,10 @@ bool Hitbox::VisibleHitbox()
 {
 	return showHitBox;
 }
+
+hitboxes Hitbox::Type()
+{
+	return type;
+}
+
+
