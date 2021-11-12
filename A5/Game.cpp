@@ -738,52 +738,54 @@ void Game::Draw(float deltaTime, float totalTime)
 		
 		if (players[i]->HasHitBox())
 		{
-			if((i == 0 && p1Active) || (i == 1 && p2Active))
-			vsData.view = camera->GetViewMatrix();
-			vsData.projection = camera->GetProjectionMatrix();
+			if ((i == 0 && p1Active) || (i == 1 && p2Active))
+			{
+				vsData.view = camera->GetViewMatrix();
+				vsData.projection = camera->GetProjectionMatrix();
 
-			//shader decleration
-			vsData.colorTint = players[i]->UsedHitbox()->GetEntity()->GetMaterial()->GetColorTint();
-			vsData.world = players[i]->UsedHitbox()->GetEntity()->GetTransform()->GetWorldMatrix();
+				//shader decleration
+				vsData.colorTint = players[i]->UsedHitbox()->GetEntity()->GetMaterial()->GetColorTint();
+				vsData.world = players[i]->UsedHitbox()->GetEntity()->GetTransform()->GetWorldMatrix();
 
-			D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
-			context->Map(constBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+				D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
+				context->Map(constBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
 
-			memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
+				memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
 
-			context->Unmap(constBufferVS.Get(), 0);
+				context->Unmap(constBufferVS.Get(), 0);
 
-			context->VSSetConstantBuffers(0, 1, constBufferVS.GetAddressOf());
+				context->VSSetConstantBuffers(0, 1, constBufferVS.GetAddressOf());
 
-			// Set the vertex and pixel shaders to use for the next Draw() command
-			//  - These don't technically need to be set every frame
-			//  - Once you start applying different shaders to different objects,
-			//    you'll need to swap the current shaders before each draw
-			context->VSSetShader(players[i]->UsedHitbox()->GetEntity()->GetMaterial()->GetVertexShader().Get(), 0, 0);
-			context->PSSetShader(players[i]->UsedHitbox()->GetEntity()->GetMaterial()->GetPixelShader().Get(), 0, 0);
-
-
-			// Ensure the pipeline knows how to interpret the data (numbers)
-			// from the vertex buffer.  
-			// - If all of your 3D models use the exact same vertex layout,
-			//    this could simply be done once in Init()
-			// - However, this isn't always the case (but might be for this course)
-			context->IASetInputLayout(inputLayout.Get());
+				// Set the vertex and pixel shaders to use for the next Draw() command
+				//  - These don't technically need to be set every frame
+				//  - Once you start applying different shaders to different objects,
+				//    you'll need to swap the current shaders before each draw
+				context->VSSetShader(players[i]->UsedHitbox()->GetEntity()->GetMaterial()->GetVertexShader().Get(), 0, 0);
+				context->PSSetShader(players[i]->UsedHitbox()->GetEntity()->GetMaterial()->GetPixelShader().Get(), 0, 0);
 
 
-			// Set buffers in the input assembler
-			//  - Do this ONCE PER OBJECT you're drawing, since each object might
-			//    have different geometry.
-			//  - for this demo, this step *could* simply be done once during Init(),
-			//    but I'm doing it here because it's often done multiple times per frame
-			//    in a larger application/game
-			UINT stride = sizeof(Vertex);
-			UINT offset = 0;
+				// Ensure the pipeline knows how to interpret the data (numbers)
+				// from the vertex buffer.  
+				// - If all of your 3D models use the exact same vertex layout,
+				//    this could simply be done once in Init()
+				// - However, this isn't always the case (but might be for this course)
+				context->IASetInputLayout(inputLayout.Get());
 
 
-			context->IASetVertexBuffers(0, 1, players[i]->UsedHitbox()->GetEntity()->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-			context->IASetIndexBuffer(players[i]->UsedHitbox()->GetEntity()->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-			context->DrawIndexed(players[i]->UsedHitbox()->GetEntity()->GetMesh()->getIndecesies(), 0, 0);
+				// Set buffers in the input assembler
+				//  - Do this ONCE PER OBJECT you're drawing, since each object might
+				//    have different geometry.
+				//  - for this demo, this step *could* simply be done once during Init(),
+				//    but I'm doing it here because it's often done multiple times per frame
+				//    in a larger application/game
+				UINT stride = sizeof(Vertex);
+				UINT offset = 0;
+
+
+				context->IASetVertexBuffers(0, 1, players[i]->UsedHitbox()->GetEntity()->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+				context->IASetIndexBuffer(players[i]->UsedHitbox()->GetEntity()->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+				context->DrawIndexed(players[i]->UsedHitbox()->GetEntity()->GetMesh()->getIndecesies(), 0, 0);
+			}
 		}
 	}
 	for (int i = 0; i < projectiles.size(); i++)
@@ -791,7 +793,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		if (projectiles[i]->GetActive() == true)
 		{
 
-
+			
 			vsData.view = camera->GetViewMatrix();
 			vsData.projection = camera->GetProjectionMatrix();
 
