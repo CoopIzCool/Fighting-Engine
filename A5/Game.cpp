@@ -356,10 +356,10 @@ void Game::CreateBasicGeometry()
 
 		Vertex dTiltVerts[] =
 		{
-		{ XMFLOAT3(-0.1f, -0.06f, +0.0f), blue },
-		{ XMFLOAT3(+0.1f, -0.06f, +0.0f), green },
-		{ XMFLOAT3(+0.1f, -0.2f, +0.0f), green },
-		{ XMFLOAT3(-0.1f, -0.2f, +0.0f), blue },
+		{ XMFLOAT3(-0.2f, -0.06f, +0.0f), blue },
+		{ XMFLOAT3(+0.2f, -0.06f, +0.0f), green },
+		{ XMFLOAT3(+0.2f, -0.2f, +0.0f), green },
+		{ XMFLOAT3(-0.2f, -0.2f, +0.0f), blue },
 		};
 		Mesh* dMesh = new Mesh(dTiltVerts, 4, indices, 6, device);
 		dTiltMeshes[i] = dMesh;
@@ -872,21 +872,49 @@ void Game::PlayerHit(bool isP1)
 			p1Active = false;
 			p1Starting = false;
 			p1End = false;
-			p1->ResetFrames();
-			
-			Hitbox* hb = jabQueue.front();
-			if (reverse)
+			switch (p1->UsedHitbox()->Type())
 			{
-				p2->LaunchPlayer(hb->P2Launch());
-			}
-			else
+			case hitboxes::jab:
 			{
-				p2->LaunchPlayer(hb->Launch());
+				
+
+				Hitbox* hb = jabQueue.front();
+				if (reverse)
+				{
+					p2->LaunchPlayer(hb->P2Launch());
+				}
+				else
+				{
+					p2->LaunchPlayer(hb->Launch());
+				}
+
+				jabQueue.pop();
+				jabQueue.push(hb);
+				p1->ResetFrames();
+				hb = nullptr;
 			}
-			
-			jabQueue.pop();
-			jabQueue.push(hb);
-			hb = nullptr;
+			break;
+
+			case hitboxes::dtilt:
+			{
+				Hitbox* hb = dTiltQueue.front();
+				if (reverse)
+				{
+					p2->LaunchPlayer(hb->P2Launch());
+				}
+				else
+				{
+					p2->LaunchPlayer(hb->Launch());
+				}
+
+				dTiltQueue.pop();
+				dTiltQueue.push(hb);
+				p1->ResetFrames();
+				hb = nullptr;
+			}
+			break;
+			}
+
 			
 		}
 		break;
@@ -895,19 +923,50 @@ void Game::PlayerHit(bool isP1)
 			p2Active = false;
 			p2Starting = false;
 			p2End = false;
-			p2->ResetFrames();
-			Hitbox* hb = jabQueue.front();
-			if (!reverse)
+
+			switch (p2->UsedHitbox()->Type())
 			{
-				p1->LaunchPlayer(hb->P2Launch());
-			}
-			else
+			case hitboxes::jab:
 			{
-				p1->LaunchPlayer(hb->Launch());
+
+				Hitbox* hb = jabQueue.front();
+				if (!reverse)
+				{
+					p1->LaunchPlayer(hb->P2Launch());
+				}
+				else
+				{
+					p1->LaunchPlayer(hb->Launch());
+				}
+
+				jabQueue.pop();
+				jabQueue.push(hb);
+				p2->ResetFrames();
+				hb = nullptr;
 			}
-			jabQueue.pop();
-			jabQueue.push(hb);
-			hb = nullptr;
+			break;
+
+			case hitboxes::dtilt:
+			{
+
+				Hitbox* hb = dTiltQueue.front();
+				if (!reverse)
+				{
+					p1->LaunchPlayer(hb->P2Launch());
+				}
+				else
+				{
+					p1->LaunchPlayer(hb->Launch());
+				}
+
+				dTiltQueue.pop();
+				dTiltQueue.push(hb);
+				p2->ResetFrames();
+				hb = nullptr;
+			}
+			break;
+			}
+
 		}
 		break;
 	}

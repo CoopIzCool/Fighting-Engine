@@ -198,7 +198,7 @@ void Player::ResetFrames()
 	ActiveHitbox = nullptr;
 	allowMovement = true;
 	hasHitbox = false;
-	type = null;
+	type = hitboxes::null;
 }
 
 bool Player::HasHitBox()
