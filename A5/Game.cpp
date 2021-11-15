@@ -521,11 +521,11 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			if (GetAsyncKeyState('K') & 0x8000)
 			{
-				p1->SetFrames(dTiltQueue.front());
+				p2->SetFrames(dTiltQueue.front());
 			}
 			else
 			{
-				p1->SetFrames(jabQueue.front());
+				p2->SetFrames(jabQueue.front());
 			}
 			p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
 			p2Starting = true;
@@ -878,8 +878,6 @@ void Game::PlayerHit(bool isP1)
 			{
 			case hitboxes::jab:
 			{
-				
-
 				Hitbox* hb = jabQueue.front();
 				if (reverse)
 				{

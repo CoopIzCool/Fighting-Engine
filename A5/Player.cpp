@@ -195,10 +195,10 @@ void Player::ResetFrames()
 	frames[0] = 0;
 	frames[1] = 0;
 	frames[2] = 0;
-	ActiveHitbox = nullptr;
+	//ActiveHitbox = nullptr;
 	allowMovement = true;
 	hasHitbox = false;
-	type = hitboxes::null;
+	//type = hitboxes::null;
 }
 
 bool Player::HasHitBox()
