@@ -89,7 +89,10 @@ Game::~Game()
 	{
 		delete(jabMeshes[i]);
 		delete(jabEntities[i]);
-
+		delete(dTiltMeshes[i]);
+		delete(dTiltEntities[i]);
+		delete(fTiltMeshes[i]);
+		delete(fTiltEntities[i]);
 	}
 
 	int jabQueueSize = jabQueue.size();
@@ -100,19 +103,20 @@ Game::~Game()
 		jabQueue.pop();
 	}
 
-	for (int i = 0; i < 5; i++)
-	{
-		delete(dTiltMeshes[i]);
-		delete(dTiltEntities[i]);
-
-	}
-
 	int dTiltQueueSize = dTiltQueue.size();
 	for (int i = 0;i < dTiltQueueSize; i++)
 	{
 		Hitbox* hb = dTiltQueue.front();
 		delete(hb);
 		dTiltQueue.pop();
+	}
+
+	int fTiltQueueSize = fTiltQueue.size();
+	for (int i = 0;i < fTiltQueueSize; i++)
+	{
+		Hitbox* hb = fTiltQueue.front();
+		delete(hb);
+		fTiltQueue.pop();
 	}
 }
 
@@ -235,26 +239,7 @@ void Game::CreateBasicGeometry()
 	XMFLOAT4 purple = XMFLOAT4(0.41f, 0.05f, 0.68f, 0.0f);
 
 
-	// Set up the vertices of the triangle we would like to draw
-	// - We're going to copy this array, exactly as it exists in memory
-	//    over to a DirectX-controlled data structure (the vertex buffer)
-	// - Note: Since we don't have a camera or really any concept of
-	//    a "3d world" yet, we're simply describing positions within the
-	//    bounds of how the rasterizer sees our screen: [-1 to +1] on X and Y
-	// - This means (0,0) is at the very center of the screen.
-	// - These are known as "Normalized Device Coordinates" or "Homogeneous 
-	//    Screen Coords", which are ways to describe a position without
-	//    knowing the exact size (in pixels) of the image/window/etc.  
-	// - Long story short: Resizing the window also resizes the triangle,
-	//    since we're describing the triangle in terms of the window itself
-	/*
-	Vertex vertices1[] =
-	{
-		{ XMFLOAT3(+0.5f, +0.2f, +0.0f), red },
-		{ XMFLOAT3(+0.8f, -0.1f, +0.0f), blue },
-		{ XMFLOAT3(+0.2f, -0.2f, +0.0f), green },
-	};
-	*/
+
 	Vertex vertices1[] =
 	{
 		{ XMFLOAT3(-0.15f, +0.3f, +0.0f), red },
@@ -282,7 +267,7 @@ void Game::CreateBasicGeometry()
 	};
 
 
-
+#pragma region Players and Ground
 	unsigned int indices[] = { 0,1,2,0,2,3 };
 
 	mesh1 = new Mesh(vertices1, 4, indices, 6, device);
@@ -294,9 +279,19 @@ void Game::CreateBasicGeometry()
 	groundMat = new Material({ 1.0f,1.0f,1.0f,1.0f }, pixelShader, vertexShader);
 	transparentMat = new Material({ 1.0f,1.0f,1.0f,0.0f }, pixelShader, vertexShader);
 
-	entity1 = new Entity(mesh1,m1);
-	entity2 = new Entity(mesh2,m2);
+	entity1 = new Entity(mesh1, m1);
+	entity2 = new Entity(mesh2, m2);
 	groundEntity = new Entity(groundMesh, groundMat);
+
+	p1 = new Player(entity1, 100, false);
+	p1->GetEntity()->GetTransform()->setPosition(-0.5f, 0.0f, 0.0f);
+	p2 = new Player(entity2, 100, true);
+	p2->GetEntity()->GetTransform()->setPosition(0.5f, 0.0f, 0.0f);
+	players[0] = p1;
+	players[1] = p2;
+#pragma endregion
+
+
 
 #pragma region HitBox Loading
 	//projectile loading and queue loading
@@ -351,6 +346,7 @@ void Game::CreateBasicGeometry()
 		jabQueue.push(hb);
 	}
 
+	//now for down tilts
 	for (int i = 0; i < 5; i++)
 	{
 
@@ -372,19 +368,39 @@ void Game::CreateBasicGeometry()
 
 	for (int i = 0; i < 5; i++)
 	{
-		Hitbox* hb = new Hitbox(dTiltEntities[i], 10, XMFLOAT3(0.20f, 0.30f, 0.0f), 4.0f, 12.0f, 8.0f, hitboxes::dtilt);
+		Hitbox* hb = new Hitbox(dTiltEntities[i], 8, XMFLOAT3(0.10f, 0.450f, 0.0f), 4.0f, 12.0f, 8.0f, hitboxes::dtilt);
 		dTiltQueue.push(hb);
 	}
 
+	//now forward tilts
+	for (int i = 0; i < 5; i++)
+	{
+
+		Vertex fTiltVerts[] =
+		{
+		{ XMFLOAT3(-0.15f, +0.02f, +0.0f), blue },
+		{ XMFLOAT3(+0.15f, +0.02f, +0.0f), green },
+		{ XMFLOAT3(+0.15f, -0.1f, +0.0f), green },
+		{ XMFLOAT3(-0.15f, -0.1f, +0.0f), blue },
+		};
+		Mesh* fMesh = new Mesh(fTiltVerts, 4, indices, 6, device);
+		fTiltMeshes[i] = fMesh;
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		Entity* fEntity = new Entity(fTiltMeshes[i], groundMat);
+		fTiltEntities[i] = fEntity;
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		Hitbox* hb = new Hitbox(fTiltEntities[i], 12, XMFLOAT3(0.40f, 0.10f, 0.0f), 5.0f, 16.0f, 6.0f, hitboxes::ftilt);
+		fTiltQueue.push(hb);
+	}
 #pragma endregion
 
 	
-	p1 = new Player(entity1, 100, false);
-	p1->GetEntity()->GetTransform()->setPosition(-0.5f, 0.0f, 0.0f);
-	p2 = new Player(entity2, 100, true);
-	p2->GetEntity()->GetTransform()->setPosition(0.5f, 0.0f, 0.0f);
-	players[0] = p1;
-	players[1] = p2;
+
 
 }
 
@@ -409,8 +425,9 @@ void Game::Update(float deltaTime, float totalTime)
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
-	p1->Update(deltaTime);
+#pragma region P1 Game Logic
 	//game logic for p1
+	p1->Update(deltaTime);
 	if (!p1Starting && !p1Active && !p1End)
 	{
 		
@@ -426,10 +443,15 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 		else if(GetAsyncKeyState('X') & 0x8000 && !attacked1 && p1->isGrounded())
 		{
-			if (GetAsyncKeyState('S') & 0x8000)
+			if ((GetAsyncKeyState('A') & 0x8000) || (GetAsyncKeyState('D') & 0x8000))
+			{
+				p1->SetFrames(fTiltQueue.front());
+			}
+			else if (GetAsyncKeyState('S') & 0x8000)
 			{
 				p1->SetFrames(dTiltQueue.front());
 			}
+
 			else
 			{
 				p1->SetFrames(jabQueue.front());
@@ -497,16 +519,28 @@ void Game::Update(float deltaTime, float totalTime)
 				hb = nullptr;
 				}
 				break;
+			case hitboxes::ftilt:
+			{
+				p1->ResetFrames();
+				Hitbox* hb = fTiltQueue.front();
+				fTiltQueue.pop();
+				fTiltQueue.push(hb);
+				hb = nullptr;
+			}
+			break;
+			
 			}
 
 		}
 	}
+#pragma endregion
 
+#pragma region P2GameLogic
 	//game logic for p2
 	p2->Update(deltaTime);
 	if (!p2Starting && !p2Active && !p2End)
 	{
-		
+
 		//projectile firing for 2
 		if (GetAsyncKeyState('N') & 0x8000 && !fired2)
 		{
@@ -517,9 +551,14 @@ void Game::Update(float deltaTime, float totalTime)
 			projQueue.pop();
 
 		}
-		else if(GetAsyncKeyState('M') & 0x8000 && !attacked2 && p2->isGrounded())
+		else if (GetAsyncKeyState('M') & 0x8000 && !attacked2 && p2->isGrounded())
 		{
-			if (GetAsyncKeyState('K') & 0x8000)
+
+			if ((GetAsyncKeyState('J') & 0x8000) || (GetAsyncKeyState('L') & 0x8000))
+			{
+				p2->SetFrames(fTiltQueue.front());
+			}
+			else if (GetAsyncKeyState('K') & 0x8000)
 			{
 				p2->SetFrames(dTiltQueue.front());
 			}
@@ -558,7 +597,7 @@ void Game::Update(float deltaTime, float totalTime)
 			p2Frames = 0;
 			p2Active = false;
 			p2End = true;
-			
+
 		}
 	}
 	else if (p2End)
@@ -589,10 +628,22 @@ void Game::Update(float deltaTime, float totalTime)
 				hb = nullptr;
 			}
 			break;
+			case hitboxes::ftilt:
+			{
+				p2->ResetFrames();
+				Hitbox* hb = fTiltQueue.front();
+				fTiltQueue.pop();
+				fTiltQueue.push(hb);
+				hb = nullptr;
+			}
+			break;
 			}
 		}
 	}
+#pragma endregion
 
+	
+#pragma region Projectile Update
 	//update projectiles
 	for (int i = 0; i < projectiles.size(); i++)
 	{
@@ -628,7 +679,7 @@ void Game::Update(float deltaTime, float totalTime)
 			}
 		}
 	}
-
+#pragma endregion
 	
 }
 
@@ -873,7 +924,7 @@ void Game::PlayerHit(bool isP1)
 		{
 			p1Active = false;
 			p1Starting = false;
-			p1End = false;
+			p1End = true;
 			switch (p1->UsedHitbox()->Type())
 			{
 			case hitboxes::jab:
@@ -890,7 +941,6 @@ void Game::PlayerHit(bool isP1)
 
 				jabQueue.pop();
 				jabQueue.push(hb);
-				p1->ResetFrames();
 				hb = nullptr;
 			}
 			break;
@@ -909,7 +959,24 @@ void Game::PlayerHit(bool isP1)
 
 				dTiltQueue.pop();
 				dTiltQueue.push(hb);
-				p1->ResetFrames();
+				hb = nullptr;
+			}
+			break;
+
+			case hitboxes::ftilt:
+			{
+				Hitbox* hb = fTiltQueue.front();
+				if (reverse)
+				{
+					p2->LaunchPlayer(hb->P2Launch());
+				}
+				else
+				{
+					p2->LaunchPlayer(hb->Launch());
+				}
+
+				fTiltQueue.pop();
+				fTiltQueue.push(hb);
 				hb = nullptr;
 			}
 			break;
@@ -941,7 +1008,6 @@ void Game::PlayerHit(bool isP1)
 
 				jabQueue.pop();
 				jabQueue.push(hb);
-				p2->ResetFrames();
 				hb = nullptr;
 			}
 			break;
@@ -961,7 +1027,24 @@ void Game::PlayerHit(bool isP1)
 
 				dTiltQueue.pop();
 				dTiltQueue.push(hb);
-				p2->ResetFrames();
+				hb = nullptr;
+			}
+			break;
+
+			case hitboxes::ftilt:
+			{
+				Hitbox* hb = fTiltQueue.front();
+				if (!reverse)
+				{
+					p1->LaunchPlayer(hb->P2Launch());
+				}
+				else
+				{
+					p1->LaunchPlayer(hb->Launch());
+				}
+
+				fTiltQueue.pop();
+				fTiltQueue.push(hb);
 				hb = nullptr;
 			}
 			break;

@@ -101,6 +101,10 @@ private:
 	Mesh* dTiltMeshes[5];
 	Entity* dTiltEntities[5];
 
+	//forward tilt
+	Mesh* fTiltMeshes[5];
+	Entity* fTiltEntities[5];
+
 	//projectiles
 	std::vector<Projectile*> projectiles;
 	std::queue<Projectile*> projQueue;
@@ -109,6 +113,8 @@ private:
 	std::queue<Hitbox*> jabQueue;
 	//down tilts
 	std::queue<Hitbox*> dTiltQueue;
+	//forward tilts
+	std::queue<Hitbox*> fTiltQueue;
 
 
 

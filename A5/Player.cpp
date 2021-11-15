@@ -46,23 +46,25 @@ void Player::Update(float dt)
 					jumpFrames = 0.0f;
 					jumpPressed = false;
 				}
-
-				if (GetAsyncKeyState('A') & 0x8000)
+				if (!((GetAsyncKeyState('S')) & 0x8000))
 				{
-					entity->GetTransform()->MoveRelative(-speed, 0, 0);
-					//wall collision
-					if (entity->GetTransform()->getPosition().x < -1.2f)
+					if (GetAsyncKeyState('A') & 0x8000)
 					{
-						entity->GetTransform()->setPosition(-1.2f, tf.getPosition().y, tf.getPosition().z);
+						entity->GetTransform()->MoveRelative(-speed, 0, 0);
+						//wall collision
+						if (entity->GetTransform()->getPosition().x < -1.2f)
+						{
+							entity->GetTransform()->setPosition(-1.2f, tf.getPosition().y, tf.getPosition().z);
+						}
 					}
-				}
-				if (GetAsyncKeyState('D') & 0x8000)
-				{
-					entity->GetTransform()->MoveRelative(speed, 0, 0);
-					//wall collision
-					if (entity->GetTransform()->getPosition().x > 1.35f)
+					if (GetAsyncKeyState('D') & 0x8000)
 					{
-						entity->GetTransform()->setPosition(1.38f, tf.getPosition().y, tf.getPosition().z);
+						entity->GetTransform()->MoveRelative(speed, 0, 0);
+						//wall collision
+						if (entity->GetTransform()->getPosition().x > 1.35f)
+						{
+							entity->GetTransform()->setPosition(1.38f, tf.getPosition().y, tf.getPosition().z);
+						}
 					}
 				}
 				//turns off the abillity tojump after the player has jumped for a period of time or if the jump button is let go
@@ -102,22 +104,24 @@ void Player::Update(float dt)
 					jumpFrames = 0.0f;
 					jumpPressed = false;
 				}
-
-				if (GetAsyncKeyState('J') & 0x8000)
+				if (!((GetAsyncKeyState('K')) & 0x8000))
 				{
-					entity->GetTransform()->MoveRelative(-speed, 0, 0);
-					if (entity->GetTransform()->getPosition().x < -1.2f)
+					if (GetAsyncKeyState('J') & 0x8000)
 					{
-						entity->GetTransform()->setPosition(-1.2f, tf.getPosition().y, tf.getPosition().z);
+						entity->GetTransform()->MoveRelative(-speed, 0, 0);
+						if (entity->GetTransform()->getPosition().x < -1.2f)
+						{
+							entity->GetTransform()->setPosition(-1.2f, tf.getPosition().y, tf.getPosition().z);
 
+						}
 					}
-				}
-				if (GetAsyncKeyState('L') & 0x8000)
-				{
-					entity->GetTransform()->MoveRelative(speed, 0, 0);
-					if (entity->GetTransform()->getPosition().x > 1.35f)
+					if (GetAsyncKeyState('L') & 0x8000)
 					{
-						entity->GetTransform()->setPosition(1.35f, tf.getPosition().y, tf.getPosition().z);
+						entity->GetTransform()->MoveRelative(speed, 0, 0);
+						if (entity->GetTransform()->getPosition().x > 1.35f)
+						{
+							entity->GetTransform()->setPosition(1.35f, tf.getPosition().y, tf.getPosition().z);
+						}
 					}
 				}
 				//jumping logic for p2
@@ -195,7 +199,7 @@ void Player::ResetFrames()
 	frames[0] = 0;
 	frames[1] = 0;
 	frames[2] = 0;
-	//ActiveHitbox = nullptr;
+	ActiveHitbox = nullptr;
 	allowMovement = true;
 	hasHitbox = false;
 	//type = hitboxes::null;
@@ -214,7 +218,7 @@ Hitbox* Player::UsedHitbox()
 void Player::LaunchPlayer(DirectX::XMFLOAT3 angle)
 {
 	float amplify = 1.0f + ((100.0 - (float)hitpoints) / 100.0f);
-	entity->GetTransform()->MoveRelative(angle.x * amplify,angle.y * amplify,angle.z);
+	entity->GetTransform()->MoveRelative(angle.x * amplify ,angle.y * amplify ,angle.z);
 
 	if (entity->GetTransform()->getPosition().x > 1.35f)
 	{
