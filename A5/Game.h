@@ -109,6 +109,9 @@ private:
 	std::queue<Hitbox*> jabQueue;
 	//down tilts
 	std::queue<Hitbox*> dTiltQueue;
+
+
+
 	//player attack states
 	bool p1Starting = false;
 	bool p2Starting = false;
