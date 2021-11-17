@@ -16,6 +16,7 @@
 #include <string>
 #include "Inputs.h"
 #include "HitBoxType.h"
+#include "InputRegister.h"
 
 
 class Game 
@@ -127,16 +128,23 @@ private:
 	bool p2End = false;
 	bool p1Hit = false;
 	bool p2Hit = false;
-
-
 	float p1Frames;
 	float p2Frames;
 
-	Microsoft::WRL::ComPtr<ID3D10Texture2D> texture;
 
 	//input logs
-	std::vector<inputs> InputLog1;
-	std::vector<inputs> InputLog2;
-	//h ttps://docs.microsoft.com/en-us/windows/win32/direct3d10/d3d10-graphics-programming-guide-resources-creating-textures#create-a-texture-from-a-file
+	std::vector<InputRegister*> InputLog1;
+	std::vector<InputRegister*> InputLog2;
+	std::queue<InputRegister*> inputQueue;
+
+	//bool stats because there is no on key pressed function
+	bool p1Up = false;
+	bool p1Down = false;
+	bool p1Left = false;
+	bool p1Right = false;
+	bool p2Up = false;
+	bool p2Down = false;
+	bool p2Left = false;
+	bool p2Right = false;
 };
 

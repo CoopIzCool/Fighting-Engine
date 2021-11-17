@@ -40,7 +40,7 @@ void Projectile::Update(float dt)
 {
 	if (isRight)
 	{
-		entity->GetTransform()->MoveRelative(dt/12.0f, 0.0f, 0.0f);
+		entity->GetTransform()->MoveRelative(dt/2.0f, 0.0f, 0.0f);
 		if (entity->GetTransform()->getPosition().x > 15.0f)
 		{
 			active = false;
@@ -48,7 +48,7 @@ void Projectile::Update(float dt)
 	}
 	else
 	{
-		entity->GetTransform()->MoveRelative(dt * -1.0f/12.0f, 0.0f, 0.0f);
+		entity->GetTransform()->MoveRelative(dt * -1.0f/2.0f, 0.0f, 0.0f);
 		if (entity->GetTransform()->getPosition().x < -15.0f)
 		{
 			active = false;

@@ -118,6 +118,14 @@ Game::~Game()
 		delete(hb);
 		fTiltQueue.pop();
 	}
+
+	int inputQueueSize = inputQueue.size();
+	for (int i = 0; i < inputQueueSize; i++)
+	{
+		InputRegister* IR = inputQueue.front();
+		delete(IR);
+		inputQueue.pop();
+	}
 }
 
 // --------------------------------------------------------
@@ -132,6 +140,11 @@ void Game::Init()
 	LoadShaders();
 	CreateBasicGeometry();
 	
+	for (int i = 0; i < 25; i++)
+	{
+		InputRegister* IR = new InputRegister();
+		inputQueue.push(IR);
+	}
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
@@ -428,6 +441,47 @@ void Game::Update(float deltaTime, float totalTime)
 #pragma region P1 Game Logic
 	//game logic for p1
 	p1->Update(deltaTime);
+	//Register inputs
+	if ((GetAsyncKeyState('W') & 0x8000) && !p1Up)
+	{
+		InputRegister* ir = inputQueue.front();
+		ir->SetInput(inputs::up);
+		InputLog1.push_back(ir);
+		inputQueue.pop();
+	}
+	if ((GetAsyncKeyState('A') & 0x8000) && !p1Left)
+	{
+		InputRegister* ir = inputQueue.front();
+		ir->SetInput(inputs::left);
+		InputLog1.push_back(ir);
+		inputQueue.pop();
+	}
+	if ((GetAsyncKeyState('S') & 0x8000) && !p1Down)
+	{
+		InputRegister* ir = inputQueue.front();
+		ir->SetInput(inputs::down);
+		InputLog1.push_back(ir);
+		inputQueue.pop();
+	}
+	if ((GetAsyncKeyState('D') & 0x8000) && !p1Right)
+	{
+		InputRegister* ir = inputQueue.front();
+		ir->SetInput(inputs::right);
+		InputLog1.push_back(ir);
+		inputQueue.pop();
+	}
+
+	p1Up = GetAsyncKeyState('W');
+	p1Left = GetAsyncKeyState('A');
+	p1Down = GetAsyncKeyState('S');
+	p1Right = GetAsyncKeyState('D');
+
+	for (int i = 0; i < InputLog1.size(); i++)
+	{
+
+	}
+
+
 	if (!p1Starting && !p1Active && !p1End)
 	{
 		
@@ -538,6 +592,40 @@ void Game::Update(float deltaTime, float totalTime)
 #pragma region P2GameLogic
 	//game logic for p2
 	p2->Update(deltaTime);
+	//Register inputs
+	if ((GetAsyncKeyState('I') & 0x8000) && !p2Up)
+	{
+		InputRegister* ir = inputQueue.front();
+		ir->SetInput(inputs::up);
+		InputLog2.push_back(ir);
+		inputQueue.pop();
+	}
+	if ((GetAsyncKeyState('J') & 0x8000) && !p2Left)
+	{
+		InputRegister* ir = inputQueue.front();
+		ir->SetInput(inputs::left);
+		InputLog2.push_back(ir);
+		inputQueue.pop();
+	}
+	if ((GetAsyncKeyState('K') & 0x8000) && !p2Down)
+	{
+		InputRegister* ir = inputQueue.front();
+		ir->SetInput(inputs::down);
+		InputLog2.push_back(ir);
+		inputQueue.pop();
+	}
+	if ((GetAsyncKeyState('L') & 0x8000) && !p2Right)
+	{
+		InputRegister* ir = inputQueue.front();
+		ir->SetInput(inputs::right);
+		InputLog2.push_back(ir);
+		inputQueue.pop();
+	}
+	p2Up = GetAsyncKeyState('I');
+	p2Left = GetAsyncKeyState('J');
+	p2Down = GetAsyncKeyState('K');
+	p2Right = GetAsyncKeyState('L');
+
 	if (!p2Starting && !p2Active && !p2End)
 	{
 

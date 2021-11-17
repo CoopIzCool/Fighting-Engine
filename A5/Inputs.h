@@ -1,5 +1,5 @@
 #ifndef INPUTS_H
 #define INPUTS_H
 
-enum inputs{ up,down,left,right };
+enum class inputs{ up,down,left,right };
 #endif // !INPUTS/h

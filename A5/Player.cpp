@@ -73,7 +73,7 @@ void Player::Update(float dt)
 					freeFall = true;
 					jumpFrames = 0.0f;
 				}
-				if (!freeFall && jumpFrames >= 10.0f)
+				if (!freeFall && jumpFrames >= 15.0f)
 				{
 					freeFall = true;
 					jumpFrames = 0.0f;
@@ -91,7 +91,7 @@ void Player::Update(float dt)
 					{
 						jumpPressed = true;
 					}
-					//jumpFrames += (dt * 60.0f);
+					jumpFrames += (dt * 60.0f);
 				}
 				else if (tf.getPosition().y > 0)
 				{
@@ -130,7 +130,7 @@ void Player::Update(float dt)
 					freeFall = true;
 					jumpFrames = 0.0f;
 				}
-				if (!freeFall && jumpFrames >= 10.0f)
+				if (!freeFall && jumpFrames >= 15.0f)
 				{
 					freeFall = true;
 					jumpFrames = 0.0f;
