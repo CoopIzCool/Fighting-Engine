@@ -53,6 +53,15 @@ Game::~Game()
 	delete(mesh2);
 	delete(groundMesh);
 
+	if (p1->HasHitBox())
+	{
+		delete(p1->UsedHitbox());
+	}
+
+	if (p2->HasHitBox())
+	{
+		delete(p2->UsedHitbox());
+	}
 	delete(p1);
 	delete(entity1);
 	delete(p2);
@@ -125,6 +134,16 @@ Game::~Game()
 		InputRegister* IR = inputQueue.front();
 		delete(IR);
 		inputQueue.pop();
+	}
+	int inputLogSize1 = InputLog1.size();
+	for (int i = 0; i < inputLogSize1; i++)
+	{
+		delete(InputLog1[i]);
+	}
+	int inputLogSize2 = InputLog2.size();
+	for (int i = 0; i < inputLogSize2; i++)
+	{
+		delete(InputLog2[i]);
 	}
 }
 
@@ -441,7 +460,7 @@ void Game::Update(float deltaTime, float totalTime)
 #pragma region P1 Game Logic
 	//game logic for p1
 	p1->Update(deltaTime);
-	//Register inputs
+#pragma region Register Inputs
 	if ((GetAsyncKeyState('W') & 0x8000) && !p1Up)
 	{
 		InputRegister* ir = inputQueue.front();
@@ -476,10 +495,8 @@ void Game::Update(float deltaTime, float totalTime)
 	p1Down = GetAsyncKeyState('S');
 	p1Right = GetAsyncKeyState('D');
 
-	for (int i = 0; i < InputLog1.size(); i++)
-	{
+#pragma endregion
 
-	}
 
 
 	if (!p1Starting && !p1Active && !p1End)
@@ -497,18 +514,57 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 		else if(GetAsyncKeyState('X') & 0x8000 && !attacked1 && p1->isGrounded())
 		{
+			//check for custom inputs
+			switch (InputLog1[0]->GetInput())
+			{
+				case inputs::down:
+				{
+					switch (InputLog1[1]->GetInput())
+					{
+						case inputs::right:
+						{
+							if (facingRight())
+							{
+								projQueue.front()->Shot(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x,
+									p1->GetEntity()->GetTransform()->getPosition().y);
+								projQueue.front()->SetOwner(true);
+								projectiles.push_back(projQueue.front());
+								projQueue.pop();
+							}
+						}
+						break;
+						case inputs::left:
+						{
+							if (!facingRight())
+							{
+								projQueue.front()->Shot(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x,
+									p1->GetEntity()->GetTransform()->getPosition().y);
+								projQueue.front()->SetOwner(true);
+								projectiles.push_back(projQueue.front());
+								projQueue.pop();
+							}
+						}
+						break;
+					}
+				}
+				break;
+			}
+
 			if ((GetAsyncKeyState('A') & 0x8000) || (GetAsyncKeyState('D') & 0x8000))
 			{
 				p1->SetFrames(fTiltQueue.front());
+				fTiltQueue.pop();
 			}
 			else if (GetAsyncKeyState('S') & 0x8000)
 			{
 				p1->SetFrames(dTiltQueue.front());
+				dTiltQueue.pop();
 			}
 
 			else
 			{
 				p1->SetFrames(jabQueue.front());
+				jabQueue.pop();
 			}
 			p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
 			p1Starting = true;
@@ -556,31 +612,29 @@ void Game::Update(float deltaTime, float totalTime)
 			{
 			case hitboxes::jab:
 				{
-				p1->ResetFrames();
-				Hitbox* hb = jabQueue.front();
-				jabQueue.pop();
+				Hitbox* hb = p1->UsedHitbox();
 				jabQueue.push(hb);
+				p1->ResetFrames();
 				hb = nullptr;
 				}
 				break;
 
 			case hitboxes::dtilt:
 				{
-				p1->ResetFrames();
-				Hitbox* hb = dTiltQueue.front();
-				dTiltQueue.pop();
+				
+				Hitbox* hb = p1->UsedHitbox();
 				dTiltQueue.push(hb);
+				p1->ResetFrames();
 				hb = nullptr;
 				}
 				break;
 			case hitboxes::ftilt:
-			{
-				p1->ResetFrames();
-				Hitbox* hb = fTiltQueue.front();
-				fTiltQueue.pop();
+				{
+				Hitbox* hb = p1->UsedHitbox();
 				fTiltQueue.push(hb);
+				p1->ResetFrames();
 				hb = nullptr;
-			}
+				}
 			break;
 			
 			}
@@ -593,6 +647,7 @@ void Game::Update(float deltaTime, float totalTime)
 	//game logic for p2
 	p2->Update(deltaTime);
 	//Register inputs
+#pragma region Register Inputs
 	if ((GetAsyncKeyState('I') & 0x8000) && !p2Up)
 	{
 		InputRegister* ir = inputQueue.front();
@@ -625,7 +680,7 @@ void Game::Update(float deltaTime, float totalTime)
 	p2Left = GetAsyncKeyState('J');
 	p2Down = GetAsyncKeyState('K');
 	p2Right = GetAsyncKeyState('L');
-
+#pragma endregion
 	if (!p2Starting && !p2Active && !p2End)
 	{
 
@@ -645,14 +700,17 @@ void Game::Update(float deltaTime, float totalTime)
 			if ((GetAsyncKeyState('J') & 0x8000) || (GetAsyncKeyState('L') & 0x8000))
 			{
 				p2->SetFrames(fTiltQueue.front());
+				fTiltQueue.pop();
 			}
 			else if (GetAsyncKeyState('K') & 0x8000)
 			{
 				p2->SetFrames(dTiltQueue.front());
+				dTiltQueue.pop();
 			}
 			else
 			{
 				p2->SetFrames(jabQueue.front());
+				jabQueue.pop();
 			}
 			p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
 			p2Starting = true;
@@ -700,28 +758,27 @@ void Game::Update(float deltaTime, float totalTime)
 			{
 			case hitboxes::jab:
 			{
-				p2->ResetFrames();
-				Hitbox* hb = jabQueue.front();
-				jabQueue.pop();
+				Hitbox* hb = p2->UsedHitbox();
 				jabQueue.push(hb);
+				p2->ResetFrames();
 				hb = nullptr;
 			}
 			break;
+
 			case hitboxes::dtilt:
 			{
-				p2->ResetFrames();
-				Hitbox* hb = dTiltQueue.front();
-				dTiltQueue.pop();
+
+				Hitbox* hb = p2->UsedHitbox();
 				dTiltQueue.push(hb);
+				p2->ResetFrames();
 				hb = nullptr;
 			}
 			break;
 			case hitboxes::ftilt:
 			{
-				p2->ResetFrames();
-				Hitbox* hb = fTiltQueue.front();
-				fTiltQueue.pop();
+				Hitbox* hb = p2->UsedHitbox();
 				fTiltQueue.push(hb);
+				p2->ResetFrames();
 				hb = nullptr;
 			}
 			break;
@@ -768,6 +825,36 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 	}
 #pragma endregion
+#pragma region Input Update
+	bool deleteInputFront1 = false;
+	for (int i = 0; i < InputLog1.size(); i++)
+	{
+		if (!(InputLog1[i]->Update(deltaTime)))
+		{
+			deleteInputFront1 = true;
+		}
+	}
+	if (deleteInputFront1)
+	{
+		inputQueue.push(InputLog1[0]);
+		InputLog1.erase(InputLog1.begin());
+	}
+
+	bool deleteInputFront2 = false;
+	for (int i = 0; i < InputLog2.size(); i++)
+	{
+		if (!(InputLog2[i]->Update(deltaTime)))
+		{
+			deleteInputFront2 = true;
+		}
+	}
+	if (deleteInputFront2)
+	{
+		inputQueue.push(InputLog2[0]);
+		InputLog2.erase(InputLog2.begin());
+	}
+#pragma endregion
+
 	
 }
 
@@ -1142,6 +1229,11 @@ void Game::PlayerHit(bool isP1)
 		break;
 	}
 	
+}
+
+bool Game::facingRight()
+{
+	return p1->GetEntity()->GetTransform()->getPosition().x - p2->GetEntity()->GetTransform()->getPosition().x < 0;
 }
 
 

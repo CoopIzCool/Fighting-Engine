@@ -14,15 +14,15 @@ void InputRegister::SetInput(inputs ip)
 	input = ip;
 }
 
-inputs InputRegister::GetInput(inputs ip)
+inputs InputRegister::GetInput()
 {
-	return inputs();
+	return input;
 }
 
 bool InputRegister::Update(float dt)
 {
 	activeFrames += dt;
-	if (activeFrames > 10.0f)
+	if (activeFrames > 20.0f)
 	{
 		activeFrames = 0;
 		return false;

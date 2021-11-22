@@ -35,6 +35,7 @@ public:
 	void Draw(float deltaTime, float totalTime);
 	void PrintHealth();
 	void PlayerHit(bool isP1);
+	bool facingRight();
 
 private:
 
@@ -146,5 +147,6 @@ private:
 	bool p2Down = false;
 	bool p2Left = false;
 	bool p2Right = false;
+	 
 };
 

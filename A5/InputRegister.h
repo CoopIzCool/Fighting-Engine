@@ -6,7 +6,7 @@ public:
 	InputRegister();
 	~InputRegister();
 	void SetInput(inputs ip);
-	inputs GetInput(inputs ip);
+	inputs GetInput();
 	bool Update(float dt);
 private:
 	float activeFrames = 0;
