@@ -102,6 +102,8 @@ Game::~Game()
 		delete(dTiltEntities[i]);
 		delete(fTiltMeshes[i]);
 		delete(fTiltEntities[i]);
+		delete(nullMeshes[i]);
+		delete(nullEntities[i]);
 	}
 
 	int jabQueueSize = jabQueue.size();
@@ -144,6 +146,13 @@ Game::~Game()
 	for (int i = 0; i < inputLogSize2; i++)
 	{
 		delete(InputLog2[i]);
+	}
+	int nullQueueSize = nullQueue.size();
+	for (int i = 0; i < nullQueueSize; i++)
+	{
+		Hitbox* hb = nullQueue.front();
+		delete(hb);
+		nullQueue.pop();
 	}
 }
 
@@ -269,7 +278,7 @@ void Game::CreateBasicGeometry()
 	XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 	XMFLOAT4 cornflower = XMFLOAT4(0.4f, 0.6f, 0.75f, 0.0f);
 	XMFLOAT4 purple = XMFLOAT4(0.41f, 0.05f, 0.68f, 0.0f);
-
+	XMFLOAT4 transparent = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 
 
 	Vertex vertices1[] =
@@ -429,6 +438,33 @@ void Game::CreateBasicGeometry()
 		Hitbox* hb = new Hitbox(fTiltEntities[i], 12, XMFLOAT3(0.40f, 0.10f, 0.0f), 5.0f, 16.0f, 6.0f, hitboxes::ftilt);
 		fTiltQueue.push(hb);
 	}
+
+
+	//null tilts, for actions that do not have a hitbox
+	for(int i = 0; i < 5; i++)
+	{
+		Vertex nullVerts[] =
+		{
+		{ XMFLOAT3(-0.0f, +0.00f, +0.0f), transparent },
+		{ XMFLOAT3(+0.0f, +0.00f, +0.0f), transparent },
+		{ XMFLOAT3(+0.0f, -0.0f, +0.0f), transparent },
+		{ XMFLOAT3(-0.0f, -0.0f, +0.0f), transparent },
+		};
+		Mesh* nMesh = new Mesh(nullVerts, 4, indices, 6, device);
+		nullMeshes[i] = nMesh;
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		Entity* nEntity = new Entity(nullMeshes[i], groundMat);
+		nullEntities[i] = nEntity;
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		Hitbox* hb = new Hitbox(nullEntities[i], 0, XMFLOAT3(0.00f, 0.0f, 0.0f), 2.0f, 30.0f, 6.0f, hitboxes::null);
+		nullQueue.push(hb);
+	}
+
 #pragma endregion
 
 	
@@ -510,17 +546,25 @@ void Game::Update(float deltaTime, float totalTime)
 			projQueue.front()->SetOwner(true);
 			projectiles.push_back(projQueue.front());
 			projQueue.pop();
-
+			fired1 = GetAsyncKeyState('C');
+			p1->SetFrames(nullQueue.front());
+			nullQueue.pop();
+			p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
+			p1Starting = true;
 		}
-		else if(GetAsyncKeyState('X') & 0x8000 && !attacked1 && p1->isGrounded())
+		else if(GetAsyncKeyState('X') & 0x8000 && !attacked1 && p1->isGrounded() )
 		{
 			//check for custom inputs
-			switch (InputLog1[0]->GetInput())
+			if (InputLog1[0] != NULL)
 			{
+				switch (InputLog1[0]->GetInput())
+				{
 				case inputs::down:
 				{
-					switch (InputLog1[1]->GetInput())
+					if (InputLog1[1] != NULL)
 					{
+						switch (InputLog1[1]->GetInput())
+						{
 						case inputs::right:
 						{
 							if (facingRight())
@@ -530,6 +574,10 @@ void Game::Update(float deltaTime, float totalTime)
 								projQueue.front()->SetOwner(true);
 								projectiles.push_back(projQueue.front());
 								projQueue.pop();
+								p1->SetFrames(nullQueue.front());
+								nullQueue.pop();
+								p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
+								p1Starting = true;
 							}
 						}
 						break;
@@ -542,34 +590,42 @@ void Game::Update(float deltaTime, float totalTime)
 								projQueue.front()->SetOwner(true);
 								projectiles.push_back(projQueue.front());
 								projQueue.pop();
+								p1->SetFrames(nullQueue.front());
+								nullQueue.pop();
+								p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
+								p1Starting = true;
 							}
 						}
 						break;
+						}
 					}
 				}
 				break;
+				}
 			}
 
-			if ((GetAsyncKeyState('A') & 0x8000) || (GetAsyncKeyState('D') & 0x8000))
-			{
-				p1->SetFrames(fTiltQueue.front());
-				fTiltQueue.pop();
-			}
-			else if (GetAsyncKeyState('S') & 0x8000)
-			{
-				p1->SetFrames(dTiltQueue.front());
-				dTiltQueue.pop();
-			}
+			if (!p1Starting) {
 
-			else
-			{
-				p1->SetFrames(jabQueue.front());
-				jabQueue.pop();
+				if ((GetAsyncKeyState('A') & 0x8000) || (GetAsyncKeyState('D') & 0x8000))
+				{
+					p1->SetFrames(fTiltQueue.front());
+					fTiltQueue.pop();
+				}
+				else if (GetAsyncKeyState('S') & 0x8000)
+				{
+					p1->SetFrames(dTiltQueue.front());
+					dTiltQueue.pop();
+				}
+
+				else
+				{
+					p1->SetFrames(jabQueue.front());
+					jabQueue.pop();
+				}
+				p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
+				p1Starting = true;
 			}
-			p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
-			p1Starting = true;
 		}
-		fired1 = GetAsyncKeyState('C');
 		attacked1 = GetAsyncKeyState('X');
 	}
 	else if (p1Starting)
@@ -636,6 +692,14 @@ void Game::Update(float deltaTime, float totalTime)
 				hb = nullptr;
 				}
 			break;
+			case hitboxes::null:
+			{
+				Hitbox* hb = p1->UsedHitbox();
+				nullQueue.push(hb);
+				p1->ResetFrames();
+				hb = nullptr;
+			}
+			break;
 			
 			}
 
@@ -692,28 +756,83 @@ void Game::Update(float deltaTime, float totalTime)
 			projQueue.front()->SetOwner(false);
 			projectiles.push_back(projQueue.front());
 			projQueue.pop();
-
+			p2->SetFrames(nullQueue.front());
+			nullQueue.pop();
+			p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
+			p2Starting = true;
 		}
 		else if (GetAsyncKeyState('M') & 0x8000 && !attacked2 && p2->isGrounded())
 		{
+			//check for custom inputs
+			if (InputLog2[0] != NULL)
+			{
+				switch (InputLog2[0]->GetInput())
+				{
+				case inputs::down:
+				{
+					if (InputLog2[1] != NULL)
+					{
+						switch (InputLog2[1]->GetInput())
+						{
+						case inputs::right:
+						{
+							if (facingRight())
+							{
+								projQueue.front()->Shot(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x,
+									p2->GetEntity()->GetTransform()->getPosition().y);
+								projQueue.front()->SetOwner(false);
+								projectiles.push_back(projQueue.front());
+								projQueue.pop();
+								p2->SetFrames(nullQueue.front());
+								nullQueue.pop();
+								p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
+								p2Starting = true;
+							}
+						}
+						break;
+						case inputs::left:
+						{
+							if (!facingRight())
+							{
+								projQueue.front()->Shot(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x,
+									p2->GetEntity()->GetTransform()->getPosition().y);
+								projQueue.front()->SetOwner(false);
+								projectiles.push_back(projQueue.front());
+								projQueue.pop();
+								p2->SetFrames(nullQueue.front());
+								nullQueue.pop();
+								p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
+								p2Starting = true;
+							}
+						}
+						break;
+						}
+					}
+				}
+				break;
+				}
+			}
 
-			if ((GetAsyncKeyState('J') & 0x8000) || (GetAsyncKeyState('L') & 0x8000))
+			if (!p2Starting)
 			{
-				p2->SetFrames(fTiltQueue.front());
-				fTiltQueue.pop();
+				if ((GetAsyncKeyState('J') & 0x8000) || (GetAsyncKeyState('L') & 0x8000))
+				{
+					p2->SetFrames(fTiltQueue.front());
+					fTiltQueue.pop();
+				}
+				else if (GetAsyncKeyState('K') & 0x8000)
+				{
+					p2->SetFrames(dTiltQueue.front());
+					dTiltQueue.pop();
+				}
+				else
+				{
+					p2->SetFrames(jabQueue.front());
+					jabQueue.pop();
+				}
+				p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
+				p2Starting = true;
 			}
-			else if (GetAsyncKeyState('K') & 0x8000)
-			{
-				p2->SetFrames(dTiltQueue.front());
-				dTiltQueue.pop();
-			}
-			else
-			{
-				p2->SetFrames(jabQueue.front());
-				jabQueue.pop();
-			}
-			p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
-			p2Starting = true;
 		}
 		fired2 = GetAsyncKeyState('N');
 		attacked2 = GetAsyncKeyState('M');
@@ -778,6 +897,14 @@ void Game::Update(float deltaTime, float totalTime)
 			{
 				Hitbox* hb = p2->UsedHitbox();
 				fTiltQueue.push(hb);
+				p2->ResetFrames();
+				hb = nullptr;
+			}
+			break;
+			case hitboxes::null:
+			{
+				Hitbox* hb = p2->UsedHitbox();
+				nullQueue.push(hb);
 				p2->ResetFrames();
 				hb = nullptr;
 			}

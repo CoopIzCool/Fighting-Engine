@@ -21,7 +21,7 @@ inputs InputRegister::GetInput()
 
 bool InputRegister::Update(float dt)
 {
-	activeFrames += dt;
+	activeFrames += dt * 60;
 	if (activeFrames > 20.0f)
 	{
 		activeFrames = 0;

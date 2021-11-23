@@ -107,6 +107,9 @@ private:
 	Mesh* fTiltMeshes[5];
 	Entity* fTiltEntities[5];
 
+	Mesh* nullMeshes[5];
+	Entity* nullEntities[5];
+
 	//projectiles
 	std::vector<Projectile*> projectiles;
 	std::queue<Projectile*> projQueue;
@@ -117,7 +120,8 @@ private:
 	std::queue<Hitbox*> dTiltQueue;
 	//forward tilts
 	std::queue<Hitbox*> fTiltQueue;
-
+	//null hitboxes
+	std::queue<Hitbox*> nullQueue;
 
 
 	//player attack states
