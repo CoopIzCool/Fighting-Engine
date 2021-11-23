@@ -555,15 +555,14 @@ void Game::Update(float deltaTime, float totalTime)
 		else if(GetAsyncKeyState('X') & 0x8000 && !attacked1 && p1->isGrounded() )
 		{
 			//check for custom inputs
-			if (InputLog1[0] != NULL)
+			//mmmmmmmmmmmmmmmmmmm
+			if (InputLog1.size() >= 2)
 			{
 				switch (InputLog1[0]->GetInput())
 				{
 				case inputs::down:
 				{
-					if (InputLog1[1] != NULL)
-					{
-						switch (InputLog1[1]->GetInput())
+					switch (InputLog1[1]->GetInput())
 						{
 						case inputs::right:
 						{
@@ -598,7 +597,7 @@ void Game::Update(float deltaTime, float totalTime)
 						}
 						break;
 						}
-					}
+
 				}
 				break;
 				}
@@ -764,15 +763,14 @@ void Game::Update(float deltaTime, float totalTime)
 		else if (GetAsyncKeyState('M') & 0x8000 && !attacked2 && p2->isGrounded())
 		{
 			//check for custom inputs
-			if (InputLog2[0] != NULL)
+			if (InputLog2.size() >= 2)
 			{
 				switch (InputLog2[0]->GetInput())
 				{
 				case inputs::down:
 				{
-					if (InputLog2[1] != NULL)
-					{
-						switch (InputLog2[1]->GetInput())
+
+					switch (InputLog2[1]->GetInput())
 						{
 						case inputs::right:
 						{
@@ -807,7 +805,7 @@ void Game::Update(float deltaTime, float totalTime)
 						}
 						break;
 						}
-					}
+					
 				}
 				break;
 				}
