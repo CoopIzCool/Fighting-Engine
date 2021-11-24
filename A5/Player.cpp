@@ -52,9 +52,17 @@ void Player::Update(float dt)
 					{
 						entity->GetTransform()->MoveRelative(-speed, 0, 0);
 						//wall collision
-						if (entity->GetTransform()->getPosition().x < -1.2f)
+						if (entity->GetTransform()->getPosition().x < -1.35f)
 						{
-							entity->GetTransform()->setPosition(-1.2f, tf.getPosition().y, tf.getPosition().z);
+							if (freeFall && tf.getPosition().y > 0)
+							{
+								entity->GetTransform()->setPosition(-1.35f, tf.getPosition().y, tf.getPosition().z);
+								entity->GetTransform()->MoveRelative(0, -speed, 0);
+							}
+							else
+							{
+								entity->GetTransform()->setPosition(-1.35f, tf.getPosition().y, tf.getPosition().z);
+							}
 						}
 					}
 					if (GetAsyncKeyState('D') & 0x8000)
@@ -63,7 +71,15 @@ void Player::Update(float dt)
 						//wall collision
 						if (entity->GetTransform()->getPosition().x > 1.35f)
 						{
-							entity->GetTransform()->setPosition(1.38f, tf.getPosition().y, tf.getPosition().z);
+							if (freeFall && tf.getPosition().y > 0)
+							{
+								entity->GetTransform()->setPosition(1.35f, tf.getPosition().y, tf.getPosition().z);
+								entity->GetTransform()->MoveRelative(0, -speed, 0);
+							}
+							else
+							{
+								entity->GetTransform()->setPosition(1.35f, tf.getPosition().y, tf.getPosition().z);
+							}
 						}
 					}
 				}
@@ -109,10 +125,17 @@ void Player::Update(float dt)
 					if (GetAsyncKeyState('J') & 0x8000)
 					{
 						entity->GetTransform()->MoveRelative(-speed, 0, 0);
-						if (entity->GetTransform()->getPosition().x < -1.2f)
+						if (entity->GetTransform()->getPosition().x < -1.35f)
 						{
-							entity->GetTransform()->setPosition(-1.2f, tf.getPosition().y, tf.getPosition().z);
-
+							if (freeFall && tf.getPosition().y > 0)
+							{
+								entity->GetTransform()->setPosition(-1.35f, tf.getPosition().y, tf.getPosition().z);
+								entity->GetTransform()->MoveRelative(0, -speed, 0);
+							}
+							else
+							{
+								entity->GetTransform()->setPosition(-1.35f, tf.getPosition().y, tf.getPosition().z);
+							}
 						}
 					}
 					if (GetAsyncKeyState('L') & 0x8000)
@@ -120,7 +143,15 @@ void Player::Update(float dt)
 						entity->GetTransform()->MoveRelative(speed, 0, 0);
 						if (entity->GetTransform()->getPosition().x > 1.35f)
 						{
-							entity->GetTransform()->setPosition(1.35f, tf.getPosition().y, tf.getPosition().z);
+							if (freeFall && tf.getPosition().y > 0)
+							{
+								entity->GetTransform()->setPosition(1.35f, tf.getPosition().y, tf.getPosition().z);
+								entity->GetTransform()->MoveRelative(0, -speed, 0);
+							}
+							else
+							{
+								entity->GetTransform()->setPosition(1.35f, tf.getPosition().y, tf.getPosition().z);
+							}
 						}
 					}
 				}

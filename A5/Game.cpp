@@ -495,7 +495,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 #pragma region P1 Game Logic
 	//game logic for p1
-	p1->Update(deltaTime);
+
 #pragma region Register Inputs
 	if ((GetAsyncKeyState('W') & 0x8000) && !p1Up)
 	{
@@ -555,7 +555,6 @@ void Game::Update(float deltaTime, float totalTime)
 		else if(GetAsyncKeyState('X') & 0x8000 && !attacked1 && p1->isGrounded() )
 		{
 			//check for custom inputs
-			//mmmmmmmmmmmmmmmmmmm
 			if (InputLog1.size() >= 2)
 			{
 				switch (InputLog1[0]->GetInput())
@@ -704,11 +703,12 @@ void Game::Update(float deltaTime, float totalTime)
 
 		}
 	}
+	p1->Update(deltaTime);
 #pragma endregion
 
 #pragma region P2GameLogic
 	//game logic for p2
-	p2->Update(deltaTime);
+
 	//Register inputs
 #pragma region Register Inputs
 	if ((GetAsyncKeyState('I') & 0x8000) && !p2Up)
@@ -910,6 +910,7 @@ void Game::Update(float deltaTime, float totalTime)
 			}
 		}
 	}
+	p2->Update(deltaTime);
 #pragma endregion
 
 	
