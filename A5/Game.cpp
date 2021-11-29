@@ -109,6 +109,8 @@ Game::~Game()
 		delete(dTiltEntities[i]);
 		delete(fTiltMeshes[i]);
 		delete(fTiltEntities[i]);
+		delete(uTiltMeshes[i]);
+		delete(uTiltEntities[i]);
 		delete(nullMeshes[i]);
 		delete(nullEntities[i]);
 	}
@@ -136,6 +138,15 @@ Game::~Game()
 		delete(hb);
 		fTiltQueue.pop();
 	}
+
+	int uTiltQueueSize = uTiltQueue.size();
+	for (int i = 0;i < uTiltQueueSize; i++)
+	{
+		Hitbox* hb = uTiltQueue.front();
+		delete(hb);
+		uTiltQueue.pop();
+	}
+
 
 	int inputQueueSize = inputQueue.size();
 	for (int i = 0; i < inputQueueSize; i++)
@@ -465,6 +476,31 @@ void Game::CreateBasicGeometry()
 		fTiltQueue.push(hb);
 	}
 
+	//now up tilts
+	for (int i = 0; i < 5; i++)
+	{
+
+		Vertex uTiltVerts[] =
+		{
+		{ XMFLOAT3(-0.15f, +0.02f, +0.0f), blue },
+		{ XMFLOAT3(+0.15f, +0.02f, +0.0f), green },
+		{ XMFLOAT3(+0.15f, -0.1f, +0.0f), green },
+		{ XMFLOAT3(-0.15f, -0.1f, +0.0f), blue },
+		};
+		Mesh* uMesh = new Mesh(uTiltVerts, 4, indices, 6, device);
+		uTiltMeshes[i] = uMesh;
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		Entity* uEntity = new Entity(uTiltMeshes[i], groundMat);
+		fTiltEntities[i] = uEntity;
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		Hitbox* hb = new Hitbox(fTiltEntities[i], 12, XMFLOAT3(0.40f, 0.10f, 0.0f), 5.0f, 16.0f, 6.0f, hitboxes::ftilt);
+		uTiltQueue.push(hb);
+	}
 
 	//null tilts, for actions that do not have a hitbox
 	for(int i = 0; i < 5; i++)
@@ -565,6 +601,7 @@ void Game::Update(float deltaTime, float totalTime)
 	{
 		
 		//projectile firing for 1
+		/*
 		if (GetAsyncKeyState('C') & 0x8000 && !fired1)
 		{
 			projQueue.front()->Shot(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x,
@@ -578,7 +615,8 @@ void Game::Update(float deltaTime, float totalTime)
 			p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
 			p1Starting = true;
 		}
-		else if(GetAsyncKeyState('X') & 0x8000 && !attacked1 && p1->isGrounded() )
+		*/
+		if(GetAsyncKeyState('X') & 0x8000 && !attacked1 && p1->isGrounded() )
 		{
 			//check for custom inputs
 			if (InputLog1.size() >= 2)
@@ -640,6 +678,7 @@ void Game::Update(float deltaTime, float totalTime)
 					p1->SetFrames(dTiltQueue.front());
 					dTiltQueue.pop();
 				}
+				
 
 				else
 				{
@@ -773,6 +812,7 @@ void Game::Update(float deltaTime, float totalTime)
 	if (!p2Starting && !p2Active && !p2End)
 	{
 
+		/*
 		//projectile firing for 2
 		if (GetAsyncKeyState('N') & 0x8000 && !fired2)
 		{
@@ -786,7 +826,8 @@ void Game::Update(float deltaTime, float totalTime)
 			p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
 			p2Starting = true;
 		}
-		else if (GetAsyncKeyState('M') & 0x8000 && !attacked2 && p2->isGrounded())
+		*/
+		if (GetAsyncKeyState('M') & 0x8000 && !attacked2 && p2->isGrounded())
 		{
 			//check for custom inputs
 			if (InputLog2.size() >= 2)

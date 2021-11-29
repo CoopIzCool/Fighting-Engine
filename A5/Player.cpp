@@ -24,7 +24,7 @@ void Player::Update(float dt)
 		{
 			if (!isP2)
 			{
-				if (GetAsyncKeyState('W') & 0x8000 && (!freeFall))
+				if (GetAsyncKeyState('C') & 0x8000 && (!freeFall))
 				{
 					entity->GetTransform()->MoveRelative(0, speed, 0);
 					if (jumpFrames == 0)
@@ -84,7 +84,7 @@ void Player::Update(float dt)
 					}
 				}
 				//turns off the abillity tojump after the player has jumped for a period of time or if the jump button is let go
-				if (!freeFall && !GetAsyncKeyState('W') && jumpPressed)
+				if (!freeFall && !GetAsyncKeyState('C') && jumpPressed)
 				{
 					freeFall = true;
 					jumpFrames = 0.0f;
@@ -100,7 +100,7 @@ void Player::Update(float dt)
 			//for p2
 			else
 			{
-				if (GetAsyncKeyState('I') & 0x8000 && (!freeFall))
+				if (GetAsyncKeyState('N') & 0x8000 && (!freeFall))
 				{
 					entity->GetTransform()->MoveRelative(0, speed, 0);
 					if (jumpFrames == 0.0f)
@@ -156,7 +156,7 @@ void Player::Update(float dt)
 					}
 				}
 				//jumping logic for p2
-				if (!freeFall && !GetAsyncKeyState('I') && jumpPressed)
+				if (!freeFall && !GetAsyncKeyState('N') && jumpPressed)
 				{
 					freeFall = true;
 					jumpFrames = 0.0f;
