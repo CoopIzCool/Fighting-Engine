@@ -1291,10 +1291,16 @@ void Game::PrintHealth()
 	color1.x = 1.0f - (((float)p1->GetHealth()) / 100.0f);
 	color1.y = (((float)p1->GetHealth()) / 100.0f);
 	healthBarEntity1->GetMaterial()->SetColorTint(color1);
+	healthBarEntity1->GetTransform()->setPosition(-0.4f - ((color1.y) * 0.5f), 0.6f, 0.0f);
+	healthBarEntity1->GetTransform()->setScale(color1.y, 1.0f, 1.0f);
+
 	XMFLOAT4 color2 = healthBarEntity2->GetMaterial()->GetColorTint();
 	color2.x = 1.0f - (((float)p2->GetHealth()) / 100.0f);
 	color2.y = (((float)p2->GetHealth()) / 100.0f);
 	healthBarEntity2->GetMaterial()->SetColorTint(color2);
+	healthBarEntity2->GetTransform()->setPosition(0.4f + ((color2.y) * 0.5f), 0.6f, 0.0f);
+	healthBarEntity2->GetTransform()->setScale(color2.y, 1.0f, 1.0f);
+
 }
 
 
