@@ -73,6 +73,13 @@ Game::~Game()
 	delete(m2);
 	delete(groundMat);
 	delete(transparentMat);
+
+	delete(healthBarMesh1);
+	delete(healthBarMesh2);
+	delete(healthBarMaterial1);
+	delete(healthBarMaterial2);
+	delete(healthBarEntity1);
+	delete(healthBarEntity2);
 	
 	for (int i = 0; i < 10; i++)
 	{
@@ -279,7 +286,7 @@ void Game::CreateBasicGeometry()
 	XMFLOAT4 cornflower = XMFLOAT4(0.4f, 0.6f, 0.75f, 0.0f);
 	XMFLOAT4 purple = XMFLOAT4(0.41f, 0.05f, 0.68f, 0.0f);
 	XMFLOAT4 transparent = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
-
+	XMFLOAT4 white = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	Vertex vertices1[] =
 	{
@@ -306,30 +313,49 @@ void Game::CreateBasicGeometry()
 		{ XMFLOAT3(+10.0f, -4.35f, +0.0f), green },
 
 	};
+	
+	Vertex healthBarVerts[] = 
+	{
+		{ XMFLOAT3(-0.5f, +0.65f, +0.0f), white},
+		{ XMFLOAT3(+0.5f, +0.65f, +0.0f), white},
+		{ XMFLOAT3(+0.5f, 0.45f, +0.0f), white},
+		{ XMFLOAT3(-0.5f, 0.45f, +0.0f), white},
 
+	};
 
-#pragma region Players and Ground
+#pragma region Players and Ground and health bars
 	unsigned int indices[] = { 0,1,2,0,2,3 };
 
 	mesh1 = new Mesh(vertices1, 4, indices, 6, device);
 	mesh2 = new Mesh(vertices2, 4, indices, 6, device);
 	groundMesh = new Mesh(groundVerts, 4, indices, 6, device);
+	healthBarMesh1 = new Mesh(healthBarVerts, 4, indices, 6, device);
+	healthBarMesh2 = new Mesh(healthBarVerts, 4, indices, 6, device);
 
 	m1 = new Material({ 0.3f,0.8f,0.6f,1.0f }, pixelShader, vertexShader);
 	m2 = new Material({ 0.9f,0.2f,0.2f,1.0f }, pixelShader, vertexShader);
 	groundMat = new Material({ 1.0f,1.0f,1.0f,1.0f }, pixelShader, vertexShader);
 	transparentMat = new Material({ 1.0f,1.0f,1.0f,0.0f }, pixelShader, vertexShader);
+	healthBarMaterial1 = new Material({ 0.0f,1.0f,0.0f,0.0f }, pixelShader, vertexShader);
+	healthBarMaterial2 = new Material({ 0.0f,1.0f,0.0f,0.0f }, pixelShader, vertexShader);
 
 	entity1 = new Entity(mesh1, m1);
 	entity2 = new Entity(mesh2, m2);
-	groundEntity = new Entity(groundMesh, groundMat);
 
+	groundEntity = new Entity(groundMesh, groundMat);
 	p1 = new Player(entity1, 100, false);
 	p1->GetEntity()->GetTransform()->setPosition(-0.5f, 0.0f, 0.0f);
 	p2 = new Player(entity2, 100, true);
 	p2->GetEntity()->GetTransform()->setPosition(0.5f, 0.0f, 0.0f);
 	players[0] = p1;
 	players[1] = p2;
+
+	healthBarEntity1 = new Entity(healthBarMesh1,healthBarMaterial1);
+	healthBarEntity1->GetTransform()->setPosition(-0.8f, 0.6f, +0.0f);
+	healthBarEntity2 = new Entity(healthBarMesh2, healthBarMaterial2);
+	healthBarEntity2->GetTransform()->setPosition(+0.8f, 0.6f, +0.0f);
+	healthBars[0] = healthBarEntity1;
+	healthBars[1] = healthBarEntity2;
 #pragma endregion
 
 
@@ -1197,6 +1223,55 @@ void Game::Draw(float deltaTime, float totalTime)
 			
 		}
 	}
+	//draw health bars
+	for (int i = 0; i < 2; i++)
+	{
+		vsData.view = camera->GetViewMatrix();
+		vsData.projection = camera->GetProjectionMatrix();
+
+		//shader decleration
+		vsData.colorTint = healthBars[i]->GetMaterial()->GetColorTint();
+		vsData.world = healthBars[i]->GetTransform()->GetWorldMatrix();
+
+		D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
+		context->Map(constBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+
+		memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
+
+		context->Unmap(constBufferVS.Get(), 0);
+
+		context->VSSetConstantBuffers(0, 1, constBufferVS.GetAddressOf());
+
+		// Set the vertex and pixel shaders to use for the next Draw() command
+		//  - These don't technically need to be set every frame
+		//  - Once you start applying different shaders to different objects,
+		//    you'll need to swap the current shaders before each draw
+		context->VSSetShader(healthBars[i]->GetMaterial()->GetVertexShader().Get(), 0, 0);
+		context->PSSetShader(healthBars[i]->GetMaterial()->GetPixelShader().Get(), 0, 0);
+
+
+		// Ensure the pipeline knows how to interpret the data (numbers)
+		// from the vertex buffer.  
+		// - If all of your 3D models use the exact same vertex layout,
+		//    this could simply be done once in Init()
+		// - However, this isn't always the case (but might be for this course)
+		context->IASetInputLayout(inputLayout.Get());
+
+
+		// Set buffers in the input assembler
+		//  - Do this ONCE PER OBJECT you're drawing, since each object might
+		//    have different geometry.
+		//  - for this demo, this step *could* simply be done once during Init(),
+		//    but I'm doing it here because it's often done multiple times per frame
+		//    in a larger application/game
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+
+
+		context->IASetVertexBuffers(0, 1, healthBars[i]->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+		context->IASetIndexBuffer(healthBars[i]->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+		context->DrawIndexed(healthBars[i]->GetMesh()->getIndecesies(), 0, 0);
+	}
 
 	// Present the back buffer to the user
 //  - Puts the final frame we're drawing into the window so the user can see it
@@ -1212,6 +1287,14 @@ void Game::PrintHealth()
 {
 	std::cout << std::flush;
 	std::cout << "Player 1 Health:  " << p1->GetHealth() << "  Player 2 Health:  " << p2->GetHealth()<<std::endl;
+	XMFLOAT4 color1 = healthBarEntity1->GetMaterial()->GetColorTint();
+	color1.x = 1.0f - (((float)p1->GetHealth()) / 100.0f);
+	color1.y = (((float)p1->GetHealth()) / 100.0f);
+	healthBarEntity1->GetMaterial()->SetColorTint(color1);
+	XMFLOAT4 color2 = healthBarEntity2->GetMaterial()->GetColorTint();
+	color2.x = 1.0f - (((float)p2->GetHealth()) / 100.0f);
+	color2.y = (((float)p2->GetHealth()) / 100.0f);
+	healthBarEntity2->GetMaterial()->SetColorTint(color2);
 }
 
 
@@ -1290,7 +1373,7 @@ void Game::PlayerHit(bool isP1)
 		{
 			p2Active = false;
 			p2Starting = false;
-			p2End = false;
+			p2End = true;
 
 			switch (p2->UsedHitbox()->Type())
 			{

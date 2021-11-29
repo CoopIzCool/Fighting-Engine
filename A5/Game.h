@@ -123,7 +123,17 @@ private:
 	//null hitboxes
 	std::queue<Hitbox*> nullQueue;
 
+	//entities for hitbars
 
+	Mesh* healthBarMesh1;
+	Material* healthBarMaterial1;
+	Entity* healthBarEntity1;
+
+	Mesh* healthBarMesh2;
+	Material* healthBarMaterial2;
+	Entity* healthBarEntity2;
+
+	Entity* healthBars[2];
 	//player attack states
 	bool p1Starting = false;
 	bool p2Starting = false;
