@@ -115,7 +115,7 @@ Game::~Game()
 		delete(nullEntities[i]);
 	}
 
-	int jabQueueSize = jabQueue.size();
+	int jabQueueSize = (int)jabQueue.size();
 	for (int i = 0;i < jabQueueSize; i++)
 	{
 		Hitbox* hb = jabQueue.front();
@@ -123,7 +123,7 @@ Game::~Game()
 		jabQueue.pop();
 	}
 
-	int dTiltQueueSize = dTiltQueue.size();
+	int dTiltQueueSize = (int)dTiltQueue.size();
 	for (int i = 0;i < dTiltQueueSize; i++)
 	{
 		Hitbox* hb = dTiltQueue.front();
@@ -131,7 +131,7 @@ Game::~Game()
 		dTiltQueue.pop();
 	}
 
-	int fTiltQueueSize = fTiltQueue.size();
+	int fTiltQueueSize = (int)fTiltQueue.size();
 	for (int i = 0;i < fTiltQueueSize; i++)
 	{
 		Hitbox* hb = fTiltQueue.front();
@@ -139,7 +139,7 @@ Game::~Game()
 		fTiltQueue.pop();
 	}
 
-	int uTiltQueueSize = uTiltQueue.size();
+	int uTiltQueueSize = (int)uTiltQueue.size();
 	for (int i = 0;i < uTiltQueueSize; i++)
 	{
 		Hitbox* hb = uTiltQueue.front();
@@ -148,24 +148,24 @@ Game::~Game()
 	}
 
 
-	int inputQueueSize = inputQueue.size();
+	int inputQueueSize = (int)inputQueue.size();
 	for (int i = 0; i < inputQueueSize; i++)
 	{
 		InputRegister* IR = inputQueue.front();
 		delete(IR);
 		inputQueue.pop();
 	}
-	int inputLogSize1 = InputLog1.size();
+	int inputLogSize1 = (int)InputLog1.size();
 	for (int i = 0; i < inputLogSize1; i++)
 	{
 		delete(InputLog1[i]);
 	}
-	int inputLogSize2 = InputLog2.size();
+	int inputLogSize2 = (int)InputLog2.size();
 	for (int i = 0; i < inputLogSize2; i++)
 	{
 		delete(InputLog2[i]);
 	}
-	int nullQueueSize = nullQueue.size();
+	int nullQueueSize = (int)nullQueue.size();
 	for (int i = 0; i < nullQueueSize; i++)
 	{
 		Hitbox* hb = nullQueue.front();
@@ -482,10 +482,10 @@ void Game::CreateBasicGeometry()
 
 		Vertex uTiltVerts[] =
 		{
-		{ XMFLOAT3(-0.15f, +0.02f, +0.0f), blue },
-		{ XMFLOAT3(+0.15f, +0.02f, +0.0f), green },
-		{ XMFLOAT3(+0.15f, -0.1f, +0.0f), green },
-		{ XMFLOAT3(-0.15f, -0.1f, +0.0f), blue },
+		{ XMFLOAT3(-0.12f, +0.5f, +0.0f), blue },
+		{ XMFLOAT3(+0.12f, +0.5f, +0.0f), green },
+		{ XMFLOAT3(+0.12f, +0.2f, +0.0f), green },
+		{ XMFLOAT3(-0.12f, +0.2f, +0.0f), blue },
 		};
 		Mesh* uMesh = new Mesh(uTiltVerts, 4, indices, 6, device);
 		uTiltMeshes[i] = uMesh;
@@ -493,12 +493,12 @@ void Game::CreateBasicGeometry()
 	for (int i = 0; i < 5; i++)
 	{
 		Entity* uEntity = new Entity(uTiltMeshes[i], groundMat);
-		fTiltEntities[i] = uEntity;
+		uTiltEntities[i] = uEntity;
 	}
 
 	for (int i = 0; i < 5; i++)
 	{
-		Hitbox* hb = new Hitbox(fTiltEntities[i], 12, XMFLOAT3(0.40f, 0.10f, 0.0f), 5.0f, 16.0f, 6.0f, hitboxes::ftilt);
+		Hitbox* hb = new Hitbox(uTiltEntities[i], 12, XMFLOAT3(0.10f, 0.60f, 0.0f), 3.0f, 10.0f, 4.0f, hitboxes::utilt);
 		uTiltQueue.push(hb);
 	}
 
@@ -666,6 +666,7 @@ void Game::Update(float deltaTime, float totalTime)
 				}
 			}
 
+			//all the inputs that are not customs
 			if (!p1Starting) {
 
 				if ((GetAsyncKeyState('A') & 0x8000) || (GetAsyncKeyState('D') & 0x8000))
@@ -678,8 +679,11 @@ void Game::Update(float deltaTime, float totalTime)
 					p1->SetFrames(dTiltQueue.front());
 					dTiltQueue.pop();
 				}
-				
-
+				else if (GetAsyncKeyState('W') & 0x8000)
+				{
+					p1->SetFrames(uTiltQueue.front());
+					uTiltQueue.pop();
+				}
 				else
 				{
 					p1->SetFrames(jabQueue.front());
@@ -754,6 +758,14 @@ void Game::Update(float deltaTime, float totalTime)
 				p1->ResetFrames();
 				hb = nullptr;
 				}
+			break;
+			case hitboxes::utilt:
+			{
+				Hitbox* hb = p1->UsedHitbox();
+				uTiltQueue.push(hb);
+				p1->ResetFrames();
+				hb = nullptr;
+			}
 			break;
 			case hitboxes::null:
 			{
@@ -841,7 +853,7 @@ void Game::Update(float deltaTime, float totalTime)
 						{
 						case inputs::right:
 						{
-							if (facingRight())
+							if (!facingRight())
 							{
 								projQueue.front()->Shot(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x,
 									p2->GetEntity()->GetTransform()->getPosition().y);
@@ -857,7 +869,7 @@ void Game::Update(float deltaTime, float totalTime)
 						break;
 						case inputs::left:
 						{
-							if (!facingRight())
+							if (facingRight())
 							{
 								projQueue.front()->Shot(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x,
 									p2->GetEntity()->GetTransform()->getPosition().y);
@@ -878,6 +890,7 @@ void Game::Update(float deltaTime, float totalTime)
 				}
 			}
 
+			//all of p2's base inouts
 			if (!p2Starting)
 			{
 				if ((GetAsyncKeyState('J') & 0x8000) || (GetAsyncKeyState('L') & 0x8000))
@@ -889,6 +902,11 @@ void Game::Update(float deltaTime, float totalTime)
 				{
 					p2->SetFrames(dTiltQueue.front());
 					dTiltQueue.pop();
+				}
+				else if (GetAsyncKeyState('I') & 0x8000)
+				{
+					p2->SetFrames(uTiltQueue.front());
+					uTiltQueue.pop();
 				}
 				else
 				{
@@ -922,6 +940,7 @@ void Game::Update(float deltaTime, float totalTime)
 			PrintHealth();
 			PlayerHit(false);
 		}
+
 		if (p2Frames >= p2->GetActive())
 		{
 			p2Frames = 0;
@@ -962,6 +981,14 @@ void Game::Update(float deltaTime, float totalTime)
 			{
 				Hitbox* hb = p2->UsedHitbox();
 				fTiltQueue.push(hb);
+				p2->ResetFrames();
+				hb = nullptr;
+			}
+
+			case hitboxes::utilt:
+			{
+				Hitbox* hb = p2->UsedHitbox();
+				uTiltQueue.push(hb);
 				p2->ResetFrames();
 				hb = nullptr;
 			}
@@ -1356,11 +1383,12 @@ void Game::PlayerHit(bool isP1)
 			p1Active = false;
 			p1Starting = false;
 			p1End = true;
+			Hitbox* hb = p1->UsedHitbox();
 			switch (p1->UsedHitbox()->Type())
 			{
+				
 			case hitboxes::jab:
 			{
-				Hitbox* hb = jabQueue.front();
 				if (reverse)
 				{
 					p2->LaunchPlayer(hb->P2Launch());
@@ -1369,16 +1397,13 @@ void Game::PlayerHit(bool isP1)
 				{
 					p2->LaunchPlayer(hb->Launch());
 				}
-
-				jabQueue.pop();
-				jabQueue.push(hb);
+				//jabQueue.push(hb);
 				hb = nullptr;
 			}
 			break;
 
 			case hitboxes::dtilt:
 			{
-				Hitbox* hb = dTiltQueue.front();
 				if (reverse)
 				{
 					p2->LaunchPlayer(hb->P2Launch());
@@ -1388,15 +1413,13 @@ void Game::PlayerHit(bool isP1)
 					p2->LaunchPlayer(hb->Launch());
 				}
 
-				dTiltQueue.pop();
-				dTiltQueue.push(hb);
+				//dTiltQueue.push(hb);
 				hb = nullptr;
 			}
 			break;
 
 			case hitboxes::ftilt:
 			{
-				Hitbox* hb = fTiltQueue.front();
 				if (reverse)
 				{
 					p2->LaunchPlayer(hb->P2Launch());
@@ -1405,29 +1428,43 @@ void Game::PlayerHit(bool isP1)
 				{
 					p2->LaunchPlayer(hb->Launch());
 				}
+				//fTiltQueue.push(hb);
+				hb = nullptr;
+			}
+			break;
 
-				fTiltQueue.pop();
-				fTiltQueue.push(hb);
+			case hitboxes::utilt:
+			{
+				if (reverse)
+				{
+					p2->LaunchPlayer(hb->P2Launch());
+				}
+				else
+				{
+					p2->LaunchPlayer(hb->Launch());
+				}
+				//uTiltQueue.push(hb);
 				hb = nullptr;
 			}
 			break;
 			}
 
-			
 		}
 		break;
+			
+	
+		
 		case false:
 		{
 			p2Active = false;
 			p2Starting = false;
 			p2End = true;
-
+			Hitbox* hb = p2->UsedHitbox();
 			switch (p2->UsedHitbox()->Type())
 			{
+				
 			case hitboxes::jab:
 			{
-
-				Hitbox* hb = jabQueue.front();
 				if (!reverse)
 				{
 					p1->LaunchPlayer(hb->P2Launch());
@@ -1437,8 +1474,7 @@ void Game::PlayerHit(bool isP1)
 					p1->LaunchPlayer(hb->Launch());
 				}
 
-				jabQueue.pop();
-				jabQueue.push(hb);
+				//jabQueue.push(hb);
 				hb = nullptr;
 			}
 			break;
@@ -1446,7 +1482,6 @@ void Game::PlayerHit(bool isP1)
 			case hitboxes::dtilt:
 			{
 
-				Hitbox* hb = dTiltQueue.front();
 				if (!reverse)
 				{
 					p1->LaunchPlayer(hb->P2Launch());
@@ -1456,15 +1491,14 @@ void Game::PlayerHit(bool isP1)
 					p1->LaunchPlayer(hb->Launch());
 				}
 
-				dTiltQueue.pop();
-				dTiltQueue.push(hb);
+				//dTiltQueue.push(hb);
 				hb = nullptr;
 			}
 			break;
 
 			case hitboxes::ftilt:
 			{
-				Hitbox* hb = fTiltQueue.front();
+
 				if (!reverse)
 				{
 					p1->LaunchPlayer(hb->P2Launch());
@@ -1474,8 +1508,24 @@ void Game::PlayerHit(bool isP1)
 					p1->LaunchPlayer(hb->Launch());
 				}
 
-				fTiltQueue.pop();
-				fTiltQueue.push(hb);
+				//fTiltQueue.push(hb);
+				hb = nullptr;
+			}
+			break;
+
+			case hitboxes::utilt:
+			{
+
+				if (!reverse)
+				{
+					p1->LaunchPlayer(hb->P2Launch());
+				}
+				else
+				{
+					p1->LaunchPlayer(hb->Launch());
+				}
+
+				//uTiltQueue.push(hb);
 				hb = nullptr;
 			}
 			break;

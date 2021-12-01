@@ -38,6 +38,7 @@ private:
 	Hitbox* ActiveHitbox = nullptr;
 	bool hasHitbox = false;
 	bool allowMovement = true;
+	bool fastfell = false;
 	hitboxes type;
 };
 
