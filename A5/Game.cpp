@@ -111,6 +111,8 @@ Game::~Game()
 		delete(fTiltEntities[i]);
 		delete(uTiltMeshes[i]);
 		delete(uTiltEntities[i]);
+		delete(dAirMeshes[i]);
+		delete(dAirEntities[i]);
 		delete(nullMeshes[i]);
 		delete(nullEntities[i]);
 	}
@@ -145,6 +147,14 @@ Game::~Game()
 		Hitbox* hb = uTiltQueue.front();
 		delete(hb);
 		uTiltQueue.pop();
+	}
+
+	int dAirQueueSize = (int)dAirQueue.size();
+	for (int i = 0;i < uTiltQueueSize; i++)
+	{
+		Hitbox* hb = dAirQueue.front();
+		delete(hb);
+		dAirQueue.pop();
 	}
 
 
@@ -295,7 +305,7 @@ void Game::CreateBasicGeometry()
 	XMFLOAT4 green = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 	XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 	XMFLOAT4 cornflower = XMFLOAT4(0.4f, 0.6f, 0.75f, 0.0f);
-	XMFLOAT4 purple = XMFLOAT4(0.41f, 0.05f, 0.68f, 0.0f);
+	XMFLOAT4 purple = XMFLOAT4(0.41f, 0.05f, 0.68f, 1.0f);
 	XMFLOAT4 transparent = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 	XMFLOAT4 white = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -502,6 +512,32 @@ void Game::CreateBasicGeometry()
 		uTiltQueue.push(hb);
 	}
 
+	//down airials
+	for (int i = 0; i < 5; i++)
+	{
+		Vertex dAirVerts[] =
+		{
+			{ XMFLOAT3(-0.15f, +0.3f, +0.0f), purple },
+			{ XMFLOAT3(+0.15f, +0.3f, +0.0f), blue },
+			{ XMFLOAT3(+0.15f, -0.15f, +0.0f), purple },
+			{ XMFLOAT3(-0.15f, -0.15f, +0.0f), blue },
+
+		};
+		Mesh* dAMesh = new Mesh(dAirVerts, 4, indices, 6, device);
+		dAirMeshes[i] = dAMesh;
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		Entity* dAEntity = new Entity(dAirMeshes[i], groundMat);
+		dAirEntities[i] = dAEntity;
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		Hitbox* hb = new Hitbox(dAirEntities[i], 15, XMFLOAT3(0.30f, 0.50f, 0.0f), 6.0f, 20.0f, 30.0f, hitboxes::dair);
+		dAirQueue.push(hb);
+	}
+
 	//null tilts, for actions that do not have a hitbox
 	for(int i = 0; i < 5; i++)
 	{
@@ -616,10 +652,12 @@ void Game::Update(float deltaTime, float totalTime)
 			p1Starting = true;
 		}
 		*/
-		if(GetAsyncKeyState('X') & 0x8000 && !attacked1 && p1->isGrounded() )
+		if(GetAsyncKeyState('X') & 0x8000 && !attacked1)
 		{
-			//check for custom inputs
-			if (InputLog1.size() >= 2)
+			if(p1->isGrounded())
+			{ 
+				//check for custom inputs
+				if (InputLog1.size() >= 2)
 			{
 				switch (InputLog1[0]->GetInput())
 				{
@@ -666,32 +704,46 @@ void Game::Update(float deltaTime, float totalTime)
 				}
 			}
 
-			//all the inputs that are not customs
-			if (!p1Starting) {
+				//all the inputs that are not customs
+				if (!p1Starting) {
 
-				if ((GetAsyncKeyState('A') & 0x8000) || (GetAsyncKeyState('D') & 0x8000))
-				{
-					p1->SetFrames(fTiltQueue.front());
-					fTiltQueue.pop();
+					if ((GetAsyncKeyState('A') & 0x8000) || (GetAsyncKeyState('D') & 0x8000))
+					{
+						p1->SetFrames(fTiltQueue.front());
+						fTiltQueue.pop();
+					}
+					else if (GetAsyncKeyState('S') & 0x8000)
+					{
+						p1->SetFrames(dTiltQueue.front());
+						dTiltQueue.pop();
+					}
+					else if (GetAsyncKeyState('W') & 0x8000)
+					{
+						p1->SetFrames(uTiltQueue.front());
+						uTiltQueue.pop();
+					}
+					else
+					{
+						p1->SetFrames(jabQueue.front());
+						jabQueue.pop();
+					}
+					p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
 				}
-				else if (GetAsyncKeyState('S') & 0x8000)
-				{
-					p1->SetFrames(dTiltQueue.front());
-					dTiltQueue.pop();
-				}
-				else if (GetAsyncKeyState('W') & 0x8000)
-				{
-					p1->SetFrames(uTiltQueue.front());
-					uTiltQueue.pop();
-				}
-				else
-				{
-					p1->SetFrames(jabQueue.front());
-					jabQueue.pop();
-				}
-				p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
-				p1Starting = true;
+				
 			}
+			else
+			{
+				if (!p1Starting)
+				{
+					if (GetAsyncKeyState('S') & 0x8000)
+					{
+						p1->SetFrames(dAirQueue.front());
+						dAirQueue.pop();
+						p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
+					}
+				}
+			}
+			p1Starting = true;
 		}
 		attacked1 = GetAsyncKeyState('X');
 	}
@@ -763,6 +815,14 @@ void Game::Update(float deltaTime, float totalTime)
 			{
 				Hitbox* hb = p1->UsedHitbox();
 				uTiltQueue.push(hb);
+				p1->ResetFrames();
+				hb = nullptr;
+			}
+			break;
+			case hitboxes::dair:
+			{
+				Hitbox* hb = p1->UsedHitbox();
+				dAirQueue.push(hb);
 				p1->ResetFrames();
 				hb = nullptr;
 			}
@@ -839,17 +899,19 @@ void Game::Update(float deltaTime, float totalTime)
 			p2Starting = true;
 		}
 		*/
-		if (GetAsyncKeyState('M') & 0x8000 && !attacked2 && p2->isGrounded())
+		if (GetAsyncKeyState('M') & 0x8000 && !attacked2)
 		{
-			//check for custom inputs
-			if (InputLog2.size() >= 2)
+			if (p2->isGrounded())
 			{
-				switch (InputLog2[0]->GetInput())
+				//check for custom inputs
+				if (InputLog2.size() >= 2)
 				{
-				case inputs::down:
-				{
+					switch (InputLog2[0]->GetInput())
+					{
+					case inputs::down:
+					{
 
-					switch (InputLog2[1]->GetInput())
+						switch (InputLog2[1]->GetInput())
 						{
 						case inputs::right:
 						{
@@ -884,38 +946,50 @@ void Game::Update(float deltaTime, float totalTime)
 						}
 						break;
 						}
-					
-				}
-				break;
-				}
-			}
 
-			//all of p2's base inouts
-			if (!p2Starting)
-			{
-				if ((GetAsyncKeyState('J') & 0x8000) || (GetAsyncKeyState('L') & 0x8000))
-				{
-					p2->SetFrames(fTiltQueue.front());
-					fTiltQueue.pop();
+					}
+					break;
+					}
 				}
-				else if (GetAsyncKeyState('K') & 0x8000)
+
+				//all of p2's base inouts
+				if (!p2Starting)
 				{
-					p2->SetFrames(dTiltQueue.front());
-					dTiltQueue.pop();
+					if ((GetAsyncKeyState('J') & 0x8000) || (GetAsyncKeyState('L') & 0x8000))
+					{
+						p2->SetFrames(fTiltQueue.front());
+						fTiltQueue.pop();
+					}
+					else if (GetAsyncKeyState('K') & 0x8000)
+					{
+						p2->SetFrames(dTiltQueue.front());
+						dTiltQueue.pop();
+					}
+					else if (GetAsyncKeyState('I') & 0x8000)
+					{
+						p2->SetFrames(uTiltQueue.front());
+						uTiltQueue.pop();
+					}
+					else
+					{
+						p2->SetFrames(jabQueue.front());
+						jabQueue.pop();
+					}
+					p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
+
 				}
-				else if (GetAsyncKeyState('I') & 0x8000)
-				{
-					p2->SetFrames(uTiltQueue.front());
-					uTiltQueue.pop();
-				}
-				else
-				{
-					p2->SetFrames(jabQueue.front());
-					jabQueue.pop();
-				}
-				p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
-				p2Starting = true;
+				
 			}
+			else
+			{
+				if (GetAsyncKeyState('K') & 0x8000)
+				{
+					p2->SetFrames(dAirQueue.front());
+					dAirQueue.pop();
+					p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
+				}
+			}
+			p2Starting = true;
 		}
 		fired2 = GetAsyncKeyState('N');
 		attacked2 = GetAsyncKeyState('M');
@@ -989,6 +1063,14 @@ void Game::Update(float deltaTime, float totalTime)
 			{
 				Hitbox* hb = p2->UsedHitbox();
 				uTiltQueue.push(hb);
+				p2->ResetFrames();
+				hb = nullptr;
+			}
+			break;
+			case hitboxes::dair:
+			{
+				Hitbox* hb = p2->UsedHitbox();
+				dAirQueue.push(hb);
 				p2->ResetFrames();
 				hb = nullptr;
 			}
@@ -1384,7 +1466,7 @@ void Game::PlayerHit(bool isP1)
 			p1Starting = false;
 			p1End = true;
 			Hitbox* hb = p1->UsedHitbox();
-			switch (p1->UsedHitbox()->Type())
+			/*switch (p1->UsedHitbox()->Type())
 			{
 				
 			case hitboxes::jab:
@@ -1447,12 +1529,19 @@ void Game::PlayerHit(bool isP1)
 				hb = nullptr;
 			}
 			break;
+			}*/
+			if (reverse)
+			{
+				p2->LaunchPlayer(hb->P2Launch());
 			}
+			else
+			{
+				p2->LaunchPlayer(hb->Launch());
+			}
+			hb = nullptr;
 
 		}
 		break;
-			
-	
 		
 		case false:
 		{
@@ -1460,7 +1549,7 @@ void Game::PlayerHit(bool isP1)
 			p2Starting = false;
 			p2End = true;
 			Hitbox* hb = p2->UsedHitbox();
-			switch (p2->UsedHitbox()->Type())
+			/*switch (p2->UsedHitbox()->Type())
 			{
 				
 			case hitboxes::jab:
@@ -1529,8 +1618,16 @@ void Game::PlayerHit(bool isP1)
 				hb = nullptr;
 			}
 			break;
+			}*/
+			if (!reverse)
+			{
+				p1->LaunchPlayer(hb->P2Launch());
 			}
-
+			else
+			{
+				p1->LaunchPlayer(hb->Launch());
+			}
+			hb = nullptr;
 		}
 		break;
 	}

@@ -107,9 +107,13 @@ private:
 	Mesh* fTiltMeshes[5];
 	Entity* fTiltEntities[5];
 
-	//forward tilt
+	//upward tilt
 	Mesh* uTiltMeshes[5];
 	Entity* uTiltEntities[5];
+
+	//downward arial
+	Mesh* dAirMeshes[5];
+	Entity* dAirEntities[5];
 
 	//null tilts
 	Mesh* nullMeshes[5];
@@ -127,6 +131,8 @@ private:
 	std::queue<Hitbox*> fTiltQueue;
 	//up tilts
 	std::queue<Hitbox*> uTiltQueue;
+	//down air
+	std::queue<Hitbox*> dAirQueue;
 	//null hitboxes
 	std::queue<Hitbox*> nullQueue;
 
