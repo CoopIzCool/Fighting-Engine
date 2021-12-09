@@ -184,6 +184,21 @@ void Player::Update(float dt)
 				}
 			}
 		}
+		else if (hitboxDown)
+		{
+			if (tf.getPosition().y > 0)
+			{
+				entity->GetTransform()->MoveRelative(0, -speed, 0);
+			}
+			else
+			{
+				entity->GetTransform()->setPosition(tf.getPosition().x, 0, tf.getPosition().z);
+				freeFall = false;
+				jumpFrames = 0.0f;
+				jumpPressed = false;
+				hitboxDown = false;
+			}
+		}
 	}
 }
 
@@ -196,6 +211,7 @@ void Player::Damage(int dmg)
 		{
 			hitpoints = 0;
 			alive = false;
+			PlaySound("Assets/Sounds/KO.mp3", NULL, SND_ASYNC);
 		}
 	}
 }
@@ -239,6 +255,7 @@ void Player::SetFrames(Hitbox* hb)
 	allowMovement = false;
 	hasHitbox = true;
 	type = hb->Type();
+
 }
 
 void Player::ResetFrames()

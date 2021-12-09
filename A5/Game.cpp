@@ -5,6 +5,7 @@
 // Needed for a helper function to read compiled shader files from the hard drive
 #pragma comment(lib, "d3dcompiler.lib")
 #include <d3dcompiler.h>
+#include<mmsystem.h>
 
 // For the DirectX Math library
 using namespace DirectX;
@@ -111,8 +112,8 @@ Game::~Game()
 		delete(fTiltEntities[i]);
 		delete(uTiltMeshes[i]);
 		delete(uTiltEntities[i]);
-		delete(dAirMeshes[i]);
-		delete(dAirEntities[i]);
+		delete(nAirMeshes[i]);
+		delete(nAirEntities[i]);
 		delete(nullMeshes[i]);
 		delete(nullEntities[i]);
 	}
@@ -149,12 +150,12 @@ Game::~Game()
 		uTiltQueue.pop();
 	}
 
-	int dAirQueueSize = (int)dAirQueue.size();
+	int dAirQueueSize = (int)nAirQueue.size();
 	for (int i = 0;i < uTiltQueueSize; i++)
 	{
-		Hitbox* hb = dAirQueue.front();
+		Hitbox* hb = nAirQueue.front();
 		delete(hb);
-		dAirQueue.pop();
+		nAirQueue.pop();
 	}
 
 
@@ -515,27 +516,27 @@ void Game::CreateBasicGeometry()
 	//down airials
 	for (int i = 0; i < 5; i++)
 	{
-		Vertex dAirVerts[] =
+		Vertex nAirVerts[] =
 		{
-			{ XMFLOAT3(-0.15f, +0.3f, +0.0f), purple },
-			{ XMFLOAT3(+0.15f, +0.3f, +0.0f), blue },
-			{ XMFLOAT3(+0.15f, -0.15f, +0.0f), purple },
-			{ XMFLOAT3(-0.15f, -0.15f, +0.0f), blue },
+			{ XMFLOAT3(-0.31f, +0.3f, +0.0f), purple },
+			{ XMFLOAT3(+0.01f, +0.3f, +0.0f), blue },
+			{ XMFLOAT3(+0.01f, -0.15f, +0.0f), purple },
+			{ XMFLOAT3(-0.31f, -0.15f, +0.0f), blue },
 
 		};
-		Mesh* dAMesh = new Mesh(dAirVerts, 4, indices, 6, device);
-		dAirMeshes[i] = dAMesh;
+		Mesh* dAMesh = new Mesh(nAirVerts, 4, indices, 6, device);
+		nAirMeshes[i] = dAMesh;
 	}
 	for (int i = 0; i < 5; i++)
 	{
-		Entity* dAEntity = new Entity(dAirMeshes[i], groundMat);
-		dAirEntities[i] = dAEntity;
+		Entity* dAEntity = new Entity(nAirMeshes[i], groundMat);
+		nAirEntities[i] = dAEntity;
 	}
 
 	for (int i = 0; i < 5; i++)
 	{
-		Hitbox* hb = new Hitbox(dAirEntities[i], 15, XMFLOAT3(0.30f, 0.50f, 0.0f), 6.0f, 20.0f, 30.0f, hitboxes::dair);
-		dAirQueue.push(hb);
+		Hitbox* hb = new Hitbox(nAirEntities[i], 15, XMFLOAT3(0.30f, 0.50f, 0.0f), 6.0f, 20.0f, 30.0f, hitboxes::nair);
+		nAirQueue.push(hb);
 	}
 
 	//null tilts, for actions that do not have a hitbox
@@ -658,7 +659,7 @@ void Game::Update(float deltaTime, float totalTime)
 			{ 
 				//check for custom inputs
 				if (InputLog1.size() >= 2)
-			{
+				{
 				switch (InputLog1[0]->GetInput())
 				{
 				case inputs::down:
@@ -702,7 +703,7 @@ void Game::Update(float deltaTime, float totalTime)
 				}
 				break;
 				}
-			}
+				}
 
 				//all the inputs that are not customs
 				if (!p1Starting) {
@@ -728,6 +729,7 @@ void Game::Update(float deltaTime, float totalTime)
 						jabQueue.pop();
 					}
 					p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
+					
 				}
 				
 			}
@@ -735,12 +737,12 @@ void Game::Update(float deltaTime, float totalTime)
 			{
 				if (!p1Starting)
 				{
-					if (GetAsyncKeyState('S') & 0x8000)
-					{
-						p1->SetFrames(dAirQueue.front());
-						dAirQueue.pop();
-						p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
-					}
+
+					p1->SetFrames(nAirQueue.front());
+					nAirQueue.pop();
+					p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
+					
+
 				}
 			}
 			p1Starting = true;
@@ -819,10 +821,10 @@ void Game::Update(float deltaTime, float totalTime)
 				hb = nullptr;
 			}
 			break;
-			case hitboxes::dair:
+			case hitboxes::nair:
 			{
 				Hitbox* hb = p1->UsedHitbox();
-				dAirQueue.push(hb);
+				nAirQueue.push(hb);
 				p1->ResetFrames();
 				hb = nullptr;
 			}
@@ -982,12 +984,11 @@ void Game::Update(float deltaTime, float totalTime)
 			}
 			else
 			{
-				if (GetAsyncKeyState('K') & 0x8000)
-				{
-					p2->SetFrames(dAirQueue.front());
-					dAirQueue.pop();
-					p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
-				}
+
+				p2->SetFrames(nAirQueue.front());
+				nAirQueue.pop();
+				p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
+
 			}
 			p2Starting = true;
 		}
@@ -1067,10 +1068,10 @@ void Game::Update(float deltaTime, float totalTime)
 				hb = nullptr;
 			}
 			break;
-			case hitboxes::dair:
+			case hitboxes::nair:
 			{
 				Hitbox* hb = p2->UsedHitbox();
-				dAirQueue.push(hb);
+				nAirQueue.push(hb);
 				p2->ResetFrames();
 				hb = nullptr;
 			}
@@ -1631,7 +1632,12 @@ void Game::PlayerHit(bool isP1)
 		}
 		break;
 	}
-	
+	bool played = PlaySound(TEXT("Assets/Sounds/hit_sound.wav"), NULL, SND_ASYNC);
+
+	if (played)
+	{
+		std::cout << "Played Sound";
+	}
 }
 
 bool Game::facingRight()

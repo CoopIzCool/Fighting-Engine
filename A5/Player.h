@@ -39,6 +39,7 @@ private:
 	bool hasHitbox = false;
 	bool allowMovement = true;
 	bool fastfell = false;
+	bool hitboxDown = false;
 	hitboxes type;
 };
 
