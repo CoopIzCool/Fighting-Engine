@@ -313,16 +313,16 @@ void Game::CreateBasicGeometry()
 	Vertex vertices1[] =
 	{
 		{ XMFLOAT3(-0.15f, +0.3f, +0.0f), red },
-		{ XMFLOAT3(+0.15f, +0.3f, +0.0f), green },
-		{ XMFLOAT3(+0.15f, -0.15f, +0.0f), blue },
-		{ XMFLOAT3(-0.15f, -0.15f, +0.0f), green },
+		{ XMFLOAT3(+0.15f, +0.3f, +0.0f), red },
+		{ XMFLOAT3(+0.15f, -0.15f, +0.0f), red },
+		{ XMFLOAT3(-0.15f, -0.15f, +0.0f), red },
 
 	};
 	Vertex vertices2[] =
 	{
-		{ XMFLOAT3(-0.15f, +0.3f, +0.0f), green },
+		{ XMFLOAT3(-0.15f, +0.3f, +0.0f), blue },
 		{ XMFLOAT3(+0.15f, +0.3f, +0.0f), blue },
-		{ XMFLOAT3(+0.15f, -0.15f, +0.0f), red },
+		{ XMFLOAT3(+0.15f, -0.15f, +0.0f), blue },
 		{ XMFLOAT3(-0.15f, -0.15f, +0.0f), blue },
 
 	};
@@ -354,8 +354,8 @@ void Game::CreateBasicGeometry()
 	healthBarMesh1 = new Mesh(healthBarVerts, 4, indices, 6, device);
 	healthBarMesh2 = new Mesh(healthBarVerts, 4, indices, 6, device);
 
-	m1 = new Material({ 0.3f,0.8f,0.6f,1.0f }, pixelShader, vertexShader);
-	m2 = new Material({ 0.9f,0.2f,0.2f,1.0f }, pixelShader, vertexShader);
+	m1 = new Material({ 0.3f,0.3f,0.3f,1.0f }, pixelShader, vertexShader);
+	m2 = new Material({ 0.3f,0.3f,0.3f,1.0f }, pixelShader, vertexShader);
 	groundMat = new Material({ 1.0f,1.0f,1.0f,1.0f }, pixelShader, vertexShader);
 	transparentMat = new Material({ 1.0f,1.0f,1.0f,0.0f }, pixelShader, vertexShader);
 	healthBarMaterial1 = new Material({ 0.0f,1.0f,0.0f,0.0f }, pixelShader, vertexShader);
@@ -442,8 +442,8 @@ void Game::CreateBasicGeometry()
 		Vertex dTiltVerts[] =
 		{
 		{ XMFLOAT3(-0.2f, -0.06f, +0.0f), blue },
-		{ XMFLOAT3(+0.2f, -0.06f, +0.0f), green },
-		{ XMFLOAT3(+0.2f, -0.2f, +0.0f), green },
+		{ XMFLOAT3(+0.2f, -0.06f, +0.0f), red },
+		{ XMFLOAT3(+0.2f, -0.2f, +0.0f), red },
 		{ XMFLOAT3(-0.2f, -0.2f, +0.0f), blue },
 		};
 		Mesh* dMesh = new Mesh(dTiltVerts, 4, indices, 6, device);
@@ -467,10 +467,10 @@ void Game::CreateBasicGeometry()
 
 		Vertex fTiltVerts[] =
 		{
-		{ XMFLOAT3(-0.15f, +0.02f, +0.0f), blue },
+		{ XMFLOAT3(-0.15f, +0.02f, +0.0f), red },
 		{ XMFLOAT3(+0.15f, +0.02f, +0.0f), green },
 		{ XMFLOAT3(+0.15f, -0.1f, +0.0f), green },
-		{ XMFLOAT3(-0.15f, -0.1f, +0.0f), blue },
+		{ XMFLOAT3(-0.15f, -0.1f, +0.0f), red },
 		};
 		Mesh* fMesh = new Mesh(fTiltVerts, 4, indices, 6, device);
 		fTiltMeshes[i] = fMesh;
@@ -493,10 +493,10 @@ void Game::CreateBasicGeometry()
 
 		Vertex uTiltVerts[] =
 		{
-		{ XMFLOAT3(-0.12f, +0.5f, +0.0f), blue },
+		{ XMFLOAT3(-0.12f, +0.5f, +0.0f), purple },
 		{ XMFLOAT3(+0.12f, +0.5f, +0.0f), green },
 		{ XMFLOAT3(+0.12f, +0.2f, +0.0f), green },
-		{ XMFLOAT3(-0.12f, +0.2f, +0.0f), blue },
+		{ XMFLOAT3(-0.12f, +0.2f, +0.0f), purple },
 		};
 		Mesh* uMesh = new Mesh(uTiltVerts, 4, indices, 6, device);
 		uTiltMeshes[i] = uMesh;
@@ -535,7 +535,7 @@ void Game::CreateBasicGeometry()
 
 	for (int i = 0; i < 5; i++)
 	{
-		Hitbox* hb = new Hitbox(nAirEntities[i], 15, XMFLOAT3(0.30f, 0.50f, 0.0f), 6.0f, 20.0f, 30.0f, hitboxes::nair);
+		Hitbox* hb = new Hitbox(nAirEntities[i], 15, XMFLOAT3(0.30f, 0.50f, 0.0f), 6.0f, 20.0f, 5.0f, hitboxes::nair);
 		nAirQueue.push(hb);
 	}
 
@@ -1632,12 +1632,16 @@ void Game::PlayerHit(bool isP1)
 		}
 		break;
 	}
-	bool played = PlaySound(TEXT("Assets/Sounds/hit_sound.wav"), NULL, SND_ASYNC);
-
-	if (played)
+	if ((!isP1 && p1->GetHealth() <= 0) || (isP1 && p2->GetHealth() <= 0))
 	{
-		std::cout << "Played Sound";
+		PlaySound(TEXT("KO.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_NODEFAULT);
 	}
+	else
+	{
+		PlaySound(TEXT("hit_sound.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_NODEFAULT);
+	}
+	
+
 }
 
 bool Game::facingRight()

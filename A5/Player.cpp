@@ -211,7 +211,8 @@ void Player::Damage(int dmg)
 		{
 			hitpoints = 0;
 			alive = false;
-			PlaySound("Assets/Sounds/KO.mp3", NULL, SND_ASYNC);
+			
+
 		}
 	}
 }
