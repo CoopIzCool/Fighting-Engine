@@ -36,14 +36,14 @@ void Projectile::Shot(float p1X, float p2X, float height)
 	}
 }
 
-void Projectile::Update(float dt)
+bool Projectile::Update(float dt)
 {
 	if (isRight)
 	{
 		entity->GetTransform()->MoveRelative(dt/2.0f, 0.0f, 0.0f);
 		if (entity->GetTransform()->getPosition().x > 15.0f)
 		{
-			active = false;
+			return false;
 		}
 	}
 	else
@@ -51,9 +51,10 @@ void Projectile::Update(float dt)
 		entity->GetTransform()->MoveRelative(dt * -1.0f/2.0f, 0.0f, 0.0f);
 		if (entity->GetTransform()->getPosition().x < -15.0f)
 		{
-			active = false;
+			return false;
 		}
 	}
+	return true;
 }
 
 bool Projectile::isColliding(Entity* playerEt)

@@ -679,6 +679,7 @@ void Game::Update(float deltaTime, float totalTime)
 								nullQueue.pop();
 								p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
 								p1Starting = true;
+								PlaySound(TEXT("shoot.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_NODEFAULT);
 							}
 						}
 						break;
@@ -695,6 +696,7 @@ void Game::Update(float deltaTime, float totalTime)
 								nullQueue.pop();
 								p1->UsedHitbox()->SetTransform(p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().y);
 								p1Starting = true;
+								PlaySound(TEXT("shoot.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_NODEFAULT);
 							}
 						}
 						break;
@@ -928,6 +930,7 @@ void Game::Update(float deltaTime, float totalTime)
 								nullQueue.pop();
 								p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
 								p2Starting = true;
+								PlaySound(TEXT("shoot.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_NODEFAULT);
 							}
 						}
 						break;
@@ -944,6 +947,7 @@ void Game::Update(float deltaTime, float totalTime)
 								nullQueue.pop();
 								p2->UsedHitbox()->SetTransform(p2->GetEntity()->GetTransform()->getPosition().x, p1->GetEntity()->GetTransform()->getPosition().x, p2->GetEntity()->GetTransform()->getPosition().y);
 								p2Starting = true;
+								PlaySound(TEXT("shoot.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_NODEFAULT);
 							}
 						}
 						break;
@@ -1098,9 +1102,14 @@ void Game::Update(float deltaTime, float totalTime)
 		//checks to see if projectile is active before running logic (temporary work around)
 		if (projectiles[i]->GetActive() == true)
 		{
-			projectiles[i]->Update(deltaTime);
+			if (!(projectiles[i]->Update(deltaTime)))
+			{
+				projectiles[i]->SetActive(false);
+				projQueue.push(projectiles[i]);
+				projectiles.erase(projectiles.begin() + i);
+			}
 			//checks to see whehter collision should be checked with p1 or p2
-			if (projectiles[i]->GetOwner())
+			else if (projectiles[i]->GetOwner())
 			{
 				//collision check for p2
 				if (projectiles[i]->isColliding(p2->GetEntity()))
@@ -1125,6 +1134,7 @@ void Game::Update(float deltaTime, float totalTime)
 					projectiles.erase(projectiles.begin() + i);
 				}
 			}
+
 		}
 	}
 #pragma endregion

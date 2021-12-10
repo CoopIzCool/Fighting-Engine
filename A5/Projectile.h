@@ -9,7 +9,7 @@ public:
 	Projectile(Entity* et, int dam);
 	~Projectile();
 	void Shot(float p1X, float p2X,float height);
-	void Update(float dt);
+	bool Update(float dt);
 	bool isColliding(Entity* playerEt);
 	int GetDamage();
 	bool GetActive();
