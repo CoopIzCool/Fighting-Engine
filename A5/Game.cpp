@@ -431,7 +431,7 @@ void Game::CreateBasicGeometry()
 
 	for (int i = 0; i < 5; i++)
 	{
-		Hitbox* hb = new Hitbox(jabEntities[i],10,XMFLOAT3(0.20f,0.30f,0.0f),4.0f,12.0f,8.0f,hitboxes::jab);
+		Hitbox* hb = new Hitbox(jabEntities[i],10,XMFLOAT3(0.20f,0.30f,0.0f),4.0f,12.0f,2.0f,hitboxes::jab);
 		jabQueue.push(hb);
 	}
 

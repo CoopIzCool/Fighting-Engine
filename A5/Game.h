@@ -90,7 +90,7 @@ private:
 	bool attacked2 = false;
 
 	//hitbox storages for mesh/entity
-	
+#pragma region Meshes and Entities
 	//projectiles
 	Mesh* projMeshes[10];
 	Entity* projEntities[10];
@@ -118,7 +118,7 @@ private:
 	//null tilts
 	Mesh* nullMeshes[5];
 	Entity* nullEntities[5];
-
+#pragma endregion
 	//projectiles
 	std::vector<Projectile*> projectiles;
 	std::queue<Projectile*> projQueue;
